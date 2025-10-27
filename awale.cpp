@@ -16,6 +16,7 @@ struct hole {
 // Total for each player
 int countJ1 = 0;
 int countJ2 = 0;
+int countSeed =  3*2*BOARDSIZE;
 
 // Player turn
 bool playJ1 = true;
@@ -28,7 +29,7 @@ void play(struct hole* board);
 int playRed(int moveFrom, bool trans, struct hole* board);
 int playBlue(int moveFrom, bool trans, struct hole* board);
 bool checkMoveValidity(int moveFrom, std::string moveSeed, struct hole* board);
-void capture();
+void capture(int lastMove, struct hole* board);
 
 
 
@@ -39,6 +40,25 @@ int main() {
     initHole(board);
     while (true) {
         play(board);
+        if (countJ1 >= 49) {
+            std::cout << "[J1] Win with " << countJ1 << " seeds vs " << countJ2 << "seeds for [J2]." << std::endl;
+            break;
+        } else if (countJ2 >= 49) {
+            std::cout << "[J2] Win with " << countJ2 << " seeds vs " << countJ1 << "seeds for [J1]." << std::endl;
+            break;
+        } else if ((countJ1 == 40) && (countJ2 == 40)) {
+            std::cout << "Draw for [J1] and [J2] with 40 seeds each." << std::endl;
+            break;
+        } else if (countSeed < 10) {
+            if (countJ1 > countJ2) {
+                std::cout << "[J1] Win (by 10 seed limit) with " << countJ1 << " seeds vs " << countJ2 << " seeds for [J2]." << std::endl;
+            } else if (countJ1 == countJ2) {
+                std::cout << "Draw (by 10 seed limit) for [J1] and [J2] with " << countJ1 << " seeds each." << std::endl;
+            } else if (countJ1 < countJ2) {
+                std::cout << "[J2] Win (by 10 seed limit) with " << countJ2 << " seeds vs " << countJ1 << " seeds for [J1]." << std::endl;
+            }
+            break;
+        }
     }
 
     return 0;
@@ -75,6 +95,7 @@ void printBoard(struct hole* board) {
         printf("|%02d\033[41m%02d\033[44m%02d\033[43m%02d\033[0m", i+1, board[i].redSeed, board[i].blueSeed, board[i].transSeed);
     }
     std::cout << "|" << std::endl << "|--------|--------|--------|--------|--------|--------|--------|--------|" << std::endl;
+    std::cout << "Score: [J1] " << countJ1 << " vs [J2] " << countJ2 << std::endl;
 }
 
 // State representation method
@@ -132,6 +153,9 @@ void play(struct hole* board) {
     } else if (moveSeed == "tr") {
         lastMove = playRed(moveFrom, true, board);
     }
+
+    // Capture if possible
+    capture(lastMove, board);
     
     playJ1 = !playJ1;
 }
@@ -164,10 +188,13 @@ int playRed(int moveFrom, bool trans, struct hole* board) {
         }
 
         // Go to next hole
-        currentPosition = (currentPosition + 1)%BOARDSIZE;
+        // Go to next hole if seeds are remaining
+        if ((transPlace > 0) || (redPlace > 0)) {
+            currentPosition = (currentPosition + 1)%BOARDSIZE;
+        }
     }
-    // Return last position
-    return currentPosition;
+    // Return last position + 1 to return in range 1-16
+    return currentPosition + 1;
 }
 
 // Play blue function
@@ -196,12 +223,14 @@ int playBlue(int moveFrom, bool trans, struct hole* board) {
             bluePlace--;
             board[currentPosition].blueSeed = board[currentPosition].blueSeed + 1;
         }
-        // Go to next opponent position
-        currentPosition = (currentPosition + 2)%BOARDSIZE;
+        // Go to next opponent position if seeds are remaining
+        if ((transPlace > 0) || (bluePlace > 0)) {
+            currentPosition = (currentPosition + 2)%BOARDSIZE;
+        }
     }
 
-    // Return last position
-    return currentPosition;
+    // Return last position + 1 to return in range 1-16
+    return currentPosition + 1;
 }
 
 // Check move validity function
@@ -242,4 +271,43 @@ bool checkMoveValidity(int moveFrom, std::string moveSeed, struct hole* board) {
 
     // Illegal seed
     return false;
+}
+
+// Capture Method
+void capture(int lastMove, struct hole* board) {
+    // Loop until we cannot capture (remember lastMove is initially position in array + 1)
+    int counter = 1;
+    while (true) {
+
+        // If we go bellow zero for capturing, then return to the opposite side of the board
+        if (lastMove-counter == -1) {
+            lastMove = BOARDSIZE;
+            counter = 1;
+        }
+
+        // Compute gain for the current hole
+        int holeTotal = board[lastMove - counter].redSeed + board[lastMove - counter].blueSeed + board[lastMove - counter].transSeed;
+        
+        // If the hole goes to 2 or 3 seeds, capture otherwise stop
+        if ((holeTotal == 2) || (holeTotal == 3)) {
+            // Capture
+            board[lastMove - counter].redSeed = 0;
+            board[lastMove - counter].blueSeed = 0;
+            board[lastMove - counter].transSeed = 0;
+
+            // Update counter for seeds
+            if (playJ1) {
+                std::cout << "[J1] Capture hole: " << board[lastMove - counter].id << " for " << holeTotal << " seeds." << std::endl;
+                countJ1 = countJ1 + holeTotal;
+            } else {
+                std::cout << "[J2] Capture hole " << board[lastMove - counter].id << " for " << holeTotal << " seeds." << std::endl;
+                countJ2 = countJ2 + holeTotal;
+            }
+            countSeed = countSeed - holeTotal;
+        } else {
+            break;
+        }
+        // Update position counter
+        counter++;
+    }
 }
