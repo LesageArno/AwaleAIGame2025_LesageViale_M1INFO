@@ -30,6 +30,8 @@ int playRed(int moveFrom, bool trans, struct hole* board);
 int playBlue(int moveFrom, bool trans, struct hole* board);
 bool checkMoveValidity(int moveFrom, std::string moveSeed, struct hole* board);
 void capture(int lastMove, struct hole* board);
+bool checkAvailableMove(struct hole* board);
+int starvingCapture(struct hole* board);
 
 
 
@@ -41,10 +43,10 @@ int main() {
     while (true) {
         play(board);
         if (countJ1 >= 49) {
-            std::cout << "[J1] Win with " << countJ1 << " seeds vs " << countJ2 << "seeds for [J2]." << std::endl;
+            std::cout << "[J1] Win with " << countJ1 << " seeds vs " << countJ2 << " seeds for [J2]." << std::endl;
             break;
         } else if (countJ2 >= 49) {
-            std::cout << "[J2] Win with " << countJ2 << " seeds vs " << countJ1 << "seeds for [J1]." << std::endl;
+            std::cout << "[J2] Win with " << countJ2 << " seeds vs " << countJ1 << " seeds for [J1]." << std::endl;
             break;
         } else if ((countJ1 == 40) && (countJ2 == 40)) {
             std::cout << "Draw for [J1] and [J2] with 40 seeds each." << std::endl;
@@ -60,6 +62,7 @@ int main() {
             break;
         }
     }
+    
 
     return 0;
 }
@@ -112,6 +115,14 @@ void play(struct hole* board) {
     
     // Select moves for J1 if selected else J2
     if (playJ1) {
+        
+        // If no move, then starving state and end of the game
+        if (!checkAvailableMove(board)) {
+            std::cout << "[J1] is starving, [J2] takes " << starvingCapture(board) << " seeds from its holes." << std::endl;
+            playJ1 = !playJ1;
+            return;
+        }
+
         while (true) {
             // Print board
             printBoard(board);
@@ -129,6 +140,14 @@ void play(struct hole* board) {
             }
         }
     } else {
+
+        // If no move, then starving state and end of the game
+        if (!checkAvailableMove(board)) {
+            std::cout << "[J2] is starving, [J1] takes " << starvingCapture(board) << " seeds from its holes." << std::endl;
+            playJ1 = !playJ1;
+            return;
+        }
+
         while (true) {
             printBoard(board);
             std::cout << "[J2] You can move from holes: 2, 4, 6, 8, 10, 12, 14, 16 and select move from r, b, tr, tb (format int str): ";
@@ -273,6 +292,28 @@ bool checkMoveValidity(int moveFrom, std::string moveSeed, struct hole* board) {
     return false;
 }
 
+// Check if any available move.
+bool checkAvailableMove(struct hole* board) {
+    for (int i = 0; i < BOARDSIZE; i++) {
+
+        // If it's the turn of J1 and the hole of J1, check whether it contains anything 
+        if (playJ1 && ((i+1) % 2 == 1)) {
+            if (board[i].blueSeed + board[i].transSeed + board[i].redSeed > 0) {
+                return true;
+            }
+
+        // Same for J2
+        } else if (!playJ1 && ((i+1) % 2 == 0)) {
+            if (board[i].blueSeed + board[i].transSeed + board[i].redSeed > 0) {
+                return true;
+            }
+        }
+    }
+
+    // If no hole are available for a particular player, then starvation.
+    return false;
+}
+
 // Capture Method
 void capture(int lastMove, struct hole* board) {
     // Loop until we cannot capture (remember lastMove is initially position in array + 1)
@@ -310,4 +351,19 @@ void capture(int lastMove, struct hole* board) {
         // Update position counter
         counter++;
     }
+}
+
+// Retrieve seed for opposite player when starving
+int starvingCapture(struct hole* board) {
+    int seedCount = 0;
+    for (int i = 0; i < BOARDSIZE; i++) {
+        if (playJ1 && ((i+1) % 2 == 1)) {
+            seedCount = seedCount + board[i].blueSeed + board[i].redSeed + board[i].transSeed;
+        } else if (!playJ1 && ((i+1) % 2 == 0)) {
+            seedCount = seedCount + board[i].blueSeed + board[i].redSeed + board[i].transSeed;
+        }
+    }
+    if (playJ1) {countJ1 = countJ1 + seedCount;}
+    if (!playJ1) {countJ2 = countJ2 + seedCount;}
+    return seedCount;
 }
