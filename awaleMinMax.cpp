@@ -383,3 +383,209 @@ int starvingCapture(struct GameState* game) {
     if (!game->playJ1) {game->countJ2 = game->countJ2 + seedCount;}
     return seedCount;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////// MIN-MAX
+std::vector<std::string> possibleMove(struct GameState* game) {
+    std::vector<std::string> possible_move;
+    for (int i = 0; i < BOARDSIZE; i++) {
+        if ((game->playJ1 && (game->board[i].id%2 == 1)) || (!game->playJ1 && (game->board[i].id%2 == 0))) {
+            if (game->board[i].redSeed != 0) {
+                possible_move.push_back(std::to_string(i+1) + " r");
+            }
+            if (game->board[i].blueSeed != 0) {
+                possible_move.push_back(std::to_string(i+1) + " b");
+            }
+            if (game->board[i].transSeed != 0) {
+                possible_move.push_back(std::to_string(i+1) + " tr");
+                possible_move.push_back(std::to_string(i+1) + " tb");
+            }
+        }
+    }
+    return possible_move;
+}
+
+bool isJ1Winning(struct GameState* game) {
+    // If J1 has the absolute majority of the seed, win 
+    if (game->countJ1 >= 49) {
+        return true;
+    }
+
+    // If J1 has the relative majority of the seed when less than 10 seed, win
+    if (game->countSeed < 10) {
+        if (game->countJ1 > game->countJ2) {
+            return true;
+        }
+    }
+
+    // Else do not win
+    return false;
+}
+
+bool isJ1Loosing(struct GameState* game) {
+    // If J2 has the absolute majority of the seed, loose 
+    if (game->countJ2 >= 49) {
+        return true;
+    }
+
+    // If J2 has the relative majority of the seed when less than 10 seed, loose
+    if (game->countSeed < 10) {
+        if (game->countJ2 > game->countJ1) {
+            return true;
+        }
+    }
+
+    // Else do not loose
+    return false;
+}
+
+bool isDraw(struct GameState* game) {
+    // If more than 40 seed recolted each, then draw
+    if ((game->countJ1 >= 40) && (game->countJ2 >= 40)) {
+        return true;
+    }
+
+    // If J1 equal J2 the majority of the seed when less than 10 seed, loose
+    if ((game->countSeed < 10) && (game->countJ1 == game->countJ2)) {
+        return true;
+    }
+
+    // Else, not draw
+    return false;
+}
+
+GameState Apply(GameState game, std::string move) {
+    GameState gameCopy = game;
+
+    // If no move available, then starving
+    if (move == "-") {
+        starvingCapture(&gameCopy);
+        gameCopy.playJ1 = !gameCopy.playJ1;
+        return gameCopy;
+    }
+
+    // Process the move
+    int sep = move.find(' ');
+    std::string moveColour = move.substr(sep+1);
+    int moveFrom = std::stoi(move.substr(0, sep));
+
+    if (moveColour == "b") {
+        moveFrom = playBlue(moveFrom, false, &gameCopy);
+    } else if (moveColour == "tb") {
+        moveFrom = playBlue(moveFrom, true, &gameCopy);
+    } else if (moveColour == "r") {
+        moveFrom = playRed(moveFrom, false, &gameCopy);
+    } else if (moveColour == "tr") {
+        moveFrom = playRed(moveFrom, true, &gameCopy);
+    }
+
+    // Capture if possible
+    capture(moveFrom, &gameCopy, false);
+    
+    gameCopy.playJ1 = !gameCopy.playJ1;
+
+    return gameCopy;
+
+}
+
+float evaluate(GameState* game);
+float evaluate(GameState* game) {
+    return 0.;
+}
+
+float MinMax(GameState game, bool isMax, int pmax) {
+    GameState gameCopy = game;
+
+    if (isJ1Winning(&gameCopy)) {return -1.;}
+    if (isJ1Loosing(&gameCopy)) {return 1.;}
+    if (isDraw(&gameCopy)) {return 0.;}
+    if (pmax == 0) {return evaluate(&gameCopy);}
+
+    float minVal = 2.;
+    float maxVal = -2.;
+    float val;
+
+    if (!checkAvailableMove(&gameCopy)) {
+        return MinMax(Apply(gameCopy, "-"), !isMax, pmax-1);
+    }
+
+    for (std::string move : possibleMove(&gameCopy)) {
+        val = MinMax(Apply(gameCopy, move), !isMax, pmax-1);
+        if (val < minVal) {
+            minVal = val;
+        }
+
+        if (val > maxVal) {
+            maxVal = val;
+        }
+    }
+
+    if (isMax) {return maxVal;}
+    if (!isMax) {return minVal;}
+}
+
+std::string DecisionMinMax(GameState* game, int pmax) {
+    std::map<std::string, float> value;
+    float bestVal = -2.;
+    float val;
+    std::string bestMove;
+
+    // If no move, then  return that the only move possible is starving
+    if (!checkAvailableMove(game)) {
+        return "-";
+    }
+
+    // Move selection
+    for (std::string move : possibleMove(game)) {
+        val = MinMax(Apply(*game, move), false, pmax);
+        if (val > bestVal) {
+            bestVal = val;
+            bestMove = move;
+        }
+    }
+
+    return bestMove;
+}
