@@ -36,10 +36,6 @@ bool checkMoveValidity(int moveFrom, std::string moveSeed, GameState* game);
 void capture(int lastMove, GameState* game, bool verbose);
 bool checkAvailableMove(GameState* game);
 int starvingCapture(GameState* game);
-std::vector<std::string> possibleMove(struct GameState* game);
-bool isJ1Loosing(struct GameState* game);
-bool isJ1Winning(struct GameState* game);
-bool isDraw(struct GameState* game);
 
 
 int main() {
