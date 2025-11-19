@@ -532,6 +532,7 @@ GameState Apply(GameState game, std::string move) {
 }
 
 float evaluate(GameState* game);
+int potentialCaptures(struct GameState* game);
 /*
 float evaluate(GameState* game) {
     return 0.;
