@@ -51,7 +51,7 @@ int main() {
         } else if (game.countJ2 >= 49) {
             std::cout << "[J2] Win with " << game.countJ2 << " seeds vs " << game.countJ1 << " seeds for [J1]." << std::endl;
             break;
-        } else if ((game.countJ1 == 40) && (game.countJ2 == 40)) {
+        } else if ((game.countJ1 >= 40) && (game.countJ2 >= 40)) {
             std::cout << "Draw for [J1] and [J2] with 40 seeds each." << std::endl;
             break;
         } else if (game.countSeed < 10) {
