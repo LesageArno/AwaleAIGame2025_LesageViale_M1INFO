@@ -36,10 +36,17 @@ bool checkMoveValidity(int moveFrom, std::string moveSeed, GameState* game);
 void capture(int lastMove, GameState* game, bool verbose);
 bool checkAvailableMove(GameState* game);
 int starvingCapture(GameState* game);
-std::vector<std::string> possibleMove(struct GameState* game);
-bool isJ1Loosing(struct GameState* game);
+
+// Minimax function signatures
+std::vector<std::string> possibleMove(struct GameStae* game);
 bool isJ1Winning(struct GameState* game);
+bool isJ1Loosing(struct GameState* game);
 bool isDraw(struct GameState* game);
+GameState Apply(GameState game, std::string move);
+float evaluate(GameState* game);
+int potentialCaptures(struct GameState* game);
+float MinMax(GameState game, bool isMax, int pmax);
+std::string DecisionMinMax(GameState* game, int pmax);
 
 
 int main() {
@@ -140,6 +147,7 @@ void play(struct GameState* game) {
             printBoard(game);
 
             // Ask move
+            std::cout << "[J1] MinMax move advise: " << DecisionMinMax(game, 3) << std::endl;
             std::cout << "[J1] You can move from holes: 1, 3, 5, 7, 9, 11, 13, 15 and select move from r, b, tr, tb (format int str): ";
             std::cin >> moveFrom >> moveSeed;
 
@@ -531,13 +539,7 @@ GameState Apply(GameState game, std::string move) {
 
 }
 
-float evaluate(GameState* game);
-int potentialCaptures(struct GameState* game);
-/*
-float evaluate(GameState* game) {
-    return 0.;
-}
-*/
+
 float evaluate(struct GameState* game){
     struct hole* board = game->board;
     float score = 0.0f;
@@ -597,7 +599,7 @@ float evaluate(struct GameState* game){
 
 
 
-int potentialCaptures (struct GameState* game){
+int potentialCaptures(struct GameState* game){
     int potential = 0;
 
     //loop on every holes of the player
@@ -670,6 +672,7 @@ float MinMax(GameState game, bool isMax, int pmax) {
     if (isDraw(&gameCopy)) {return 0.;}
     if (pmax == 0) {return evaluate(&gameCopy);}
 
+    // Min and max val are going to move between 0 and 1 anyway
     float minVal = 2.;
     float maxVal = -2.;
     float val;
@@ -691,6 +694,9 @@ float MinMax(GameState game, bool isMax, int pmax) {
 
     if (isMax) {return maxVal;}
     if (!isMax) {return minVal;}
+
+    // If for some reason we pass the ifs, then return worst case scenario
+    return -1.;
 }
 
 std::string DecisionMinMax(GameState* game, int pmax) {
