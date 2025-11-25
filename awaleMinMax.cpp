@@ -170,6 +170,7 @@ void play(struct GameState* game) {
 
         while (true) {
             printBoard(game);
+            std::cout << "[J2] MinMax move advise: " << DecisionMinMax(game, 3) << std::endl;
             std::cout << "[J2] You can move from holes: 2, 4, 6, 8, 10, 12, 14, 16 and select move from r, b, tr, tb (format int str): ";
             std::cin >> moveFrom >> moveSeed;
             if (checkMoveValidity(moveFrom, moveSeed, game)) {
@@ -704,6 +705,7 @@ std::string DecisionMinMax(GameState* game, int pmax) {
     // Note that best move and worst move are relative to J1 so worst move of J1 is best move of J2,...
     std::map<std::string, float> value;
     float bestVal = -2.;
+    float worstVal = 2.;
     float val;
     std::string bestMove;
 
@@ -714,11 +716,16 @@ std::string DecisionMinMax(GameState* game, int pmax) {
 
     // Move selection
     for (std::string move : possibleMove(game)) {
-        val = MinMax(Apply(*game, move), false, pmax);
-        if (val > bestVal) {
+        val = MinMax(Apply(*game, move), !game->playJ1, pmax);
+        if (val > bestVal && game->playJ1) {
             bestVal = val;
             bestMove = move;
-        }
+            std::cout << bestMove << " : " << bestVal << std::endl;
+        } else if (val < worstVal && !game->playJ1) {
+            worstVal = val;
+            bestMove = move;
+            std::cout << bestMove << " : " << worstVal << std::endl;
+        } 
     }
 
     return bestMove;

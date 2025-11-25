@@ -22,6 +22,8 @@ struct GameState {
     int countJ2;
     int countSeed;
     bool playJ1;
+    int winJ1In;
+    int winJ2In;
 };
 
 
@@ -172,6 +174,7 @@ void play(struct GameState* game) {
 
         while (true) {
             printBoard(game);
+            std::cout << "[J2] AlphaBeta move advise: " << DecisionAlphaBeta(game, findBestPmax(game)) << std::endl;
             std::cout << "[J2] You can move from holes: 2, 4, 6, 8, 10, 12, 14, 16 and select move from r, b, tr, tb (format int str): ";
             std::cin >> moveFrom >> moveSeed;
             if (checkMoveValidity(moveFrom, moveSeed, game)) {
@@ -600,7 +603,6 @@ float evaluate(struct GameState* game){
 }
 
 
-
 int potentialCaptures(struct GameState* game){
     int potential = 0;
 
@@ -666,67 +668,75 @@ int potentialCaptures(struct GameState* game){
 }
 
 
-float AlphaBeta(GameState game, float alpha, float beta, bool isMax, int pmax) {
-    GameState gameCopy = game;
+float AlphaBeta(GameState game, float alpha, float beta, int depth) {
+    // J1 is always maximizing
+    bool isMax = game.playJ1; 
 
-    if (isJ1Winning(&gameCopy)) {return 1.;}
-    if (isJ1Loosing(&gameCopy)) {return -1.;}
-    if (isDraw(&gameCopy)) {return 0.;}
-    if (pmax == 0) {return evaluate(&gameCopy);}
+    if (isJ1Winning(&game)) return 1.0f;
+    if (isJ1Loosing(&game)) return -1.0f;
+    if (isDraw(&game)) return 0.0f;
+    if (depth == 0) return evaluate(&game); // Always from J1's perspective
 
     // Handle starvation
-    if (!checkAvailableMove(&gameCopy)) {
-        return AlphaBeta(Apply(gameCopy, "-"), alpha, beta, !isMax, pmax-1);
+    if (!checkAvailableMove(&game)) {
+        GameState nextGame = Apply(game, "-");
+        return AlphaBeta(nextGame, alpha, beta, depth - 1);
     }
 
-    // Betacut
+    // MAXIMIZING for J1
     if (isMax) {
-        for (std::string move : possibleMove(&gameCopy)) {
-            alpha = std::max(AlphaBeta(Apply(gameCopy, move), alpha, beta, !isMax, pmax-1), alpha);
-            if (alpha >= beta) {return alpha;} 
+        float value = -2.0f;
+        for (auto &move : possibleMove(&game)) {
+            GameState next = Apply(game, move);
+            value = std::max(value, AlphaBeta(next, alpha, beta, depth - 1));
+            alpha = std::max(alpha, value);
+            if (alpha >= beta) break; // beta cut
         }
-        return alpha;
+        return value;
     }
 
-    // Alpha cut
-    for (std::string move : possibleMove(&gameCopy)) {
-        beta = std::min(AlphaBeta(Apply(gameCopy, move), alpha, beta, !isMax, pmax-1), beta);
-        if (beta <= alpha) {return beta;} 
+    // MINIMIZING for J2
+    else {
+        float value = 2.0f;
+        for (auto &move : possibleMove(&game)) {
+            GameState next = Apply(game, move);
+            value = std::min(value, AlphaBeta(next, alpha, beta, depth - 1));
+            beta = std::min(beta, value);
+            if (beta <= alpha) break; // alpha cut
+        }
+        return value;
     }
-
-    return beta;
 }
 
-std::string DecisionAlphaBeta(GameState* game, int pmax) {
-    
-    // Note that best move and worst move are relative to J1 so worst move of J1 is best move of J2,...
-    std::map<std::string, float> value;
-    float alpha = -2.;
-    float beta = 2.;
-    float val;
+
+std::string DecisionAlphaBeta(GameState* game, int depth) {
+    float alpha = -2.0f;
+    float beta  =  2.0f;
+
+    bool isMax = game->playJ1;
+
     std::string bestMove;
+    float bestVal = isMax ? -2.0f : 2.0f;
 
-    float bestVal = game->playJ1 ? alpha : beta;
+    if (!checkAvailableMove(game)) return "-";
 
-    // If no move, then  return that the only move possible is starving
-    if (!checkAvailableMove(game)) {
-        return "-";
-    }
+    for (auto &move : possibleMove(game)) {
+        GameState next = Apply(*game, move);
+        float val = AlphaBeta(next, alpha, beta, depth - 1);
 
-    // Move selection
-    for (std::string move : possibleMove(game)) {
-        val = AlphaBeta(Apply(*game, move), alpha, beta, !game->playJ1, pmax);
-
-        if (game->playJ1) {
+        if (isMax) {  // J1 turn
             if (val > bestVal) {
                 bestVal = val;
                 bestMove = move;
+                std::cout << bestMove << " : " << bestVal << std::endl;
             }
             alpha = std::max(alpha, bestVal);
-        } else {
+        }
+        else {        // J2 turn
             if (val < bestVal) {
                 bestVal = val;
                 bestMove = move;
+                std::cout << bestMove << " : " << bestVal << std::endl;
             }
             beta = std::min(beta, bestVal);
         }
@@ -734,6 +744,7 @@ std::string DecisionAlphaBeta(GameState* game, int pmax) {
 
     return bestMove;
 }
+
 
 int findBestPmax(GameState* game) {
     static float seedMaxQte = 3.*2*BOARDSIZE;
@@ -747,8 +758,8 @@ int findBestPmax(GameState* game) {
     } else if (removePercent < 0.7) {
         return 7;
     } else if (removePercent < 0.8) {
-        return 8;
+        return 7;
     } else {
-        return 9;
+        return 8;
     }
 }
