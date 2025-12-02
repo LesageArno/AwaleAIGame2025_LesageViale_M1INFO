@@ -431,16 +431,6 @@ int starvingCapture(struct GameState* game) {
 
 
 
-
-
-
-
-
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////// MIN-MAX
 std::vector<std::string> possibleMove(struct GameState* game) {
     std::vector<std::string> possible_move;
@@ -602,7 +592,112 @@ float evaluate(struct GameState* game){
     return score;
 }
 
+float evaluate2(GameState* game);
+float evaluate2(struct GameState* game){ //evaluate + block
+    struct hole* board = game->board;
+    float score = 0.0f;
+    bool isP1 = game->playJ1;
 
+    // Total seeds per player (in their 8 holes)
+    int p1Seedcount = 0;
+    int p1Seedtrans = 0;
+    for (int i = 0; i < BOARDSIZE ; i += 2){
+        p1Seedcount += board[i].redSeed + board[i].blueSeed + board[i].transSeed;
+        p1Seedtrans += board[i].transSeed;
+    }
+
+    int p2Seedcount = 0;
+    int p2Seedtrans = 0;
+    for (int i = 1; i < BOARDSIZE ; i += 2){
+        p2Seedcount += board[i].redSeed + board[i].blueSeed + board[i].transSeed;
+        p2Seedtrans += board[i].transSeed;
+    }
+
+    int seedsDiff = isP1
+        ? (p1Seedcount - p2Seedcount)
+        : (p2Seedcount - p1Seedcount);
+    int transDiff = isP1
+        ? (p1Seedtrans - p2Seedtrans)
+        : (p2Seedtrans - p1Seedtrans);
+
+    int countDiff = isP1
+        ? (game->countJ1 - game->countJ2)
+        : (game->countJ2 - game->countJ1);
+
+    int potential = potentialCaptures(game);
+    int blockPower = potentialBlock(game);
+
+    // NORMALIZATION
+    float normSeedsDiff = seedsDiff / 48.0f; //3c*8h*2p/2 -> 48 seeds
+    float normTransDiff = transDiff / 16.0f; //16 possible transmuted seeds in one half of the board (1/hole)
+    float normCountDiff = countDiff / 48.0f; //48 seeds maximum at game start (24*2)
+    float normPotential = potential / 16.0f; //estimated max 16 seeds capturable in a chain
+    float normBlock     = blockPower / 8.0f; // blockPower max typique : ~8 coups dangereux neutralisables (conservateur)
+
+    // AUTRES PARAMÈTRES (à ajouter éventuellement) :
+    // - potentiel de starvation : vérifier si on laisse l’adversaire sans coup
+    // - coups dangereux : est-ce que ce coup ouvre des captures à l’adversaire ?
+    // - potentiel de blocage : empêche l’adversaire de capturer à son tour
+    // - évaluer la vulnérabilité de nos trous à 1–2 graines
+
+    // weighted evaluation
+    score =
+        0.5f * normCountDiff +
+        0.3f * normPotential +
+        0.15f * normBlock +
+        0.1f * normSeedsDiff +
+        0.1f * normTransDiff;
+
+    // clamp -1 ; 1
+    if(score > 1.0f) score = 1.0f;
+    if(score < -1.0f) score = -1.0f;
+
+    return score;
+}
+
+int potentialBlock(struct GameState* game) {
+    int blockValue = 0;
+
+    // repère cases adverses dangereuses AVANT le coup (2/3 seeds)
+    bool dangerBefore[BOARDSIZE] = {false};
+    for (int i = (game->playJ1 ? 1 : 0); i < BOARDSIZE; i += 2) {
+        int sum = game->board[i].redSeed 
+                + game->board[i].blueSeed 
+                + game->board[i].transSeed;
+        if (sum == 2 || sum == 3) {
+            dangerBefore[i] = true;
+        }
+    }
+
+    // genere coups possibles du joueur courant
+    std::vector<std::string> moves = possibleMove(game);
+
+    int bestBlock = 0;
+    for (auto& m : moves) {
+        GameState sim = Apply(*game, m);
+
+        int blocked = 0;
+
+        // réévalue après le coup simulé
+        for (int i = (game->playJ1 ? 1 : 0); i < BOARDSIZE; i += 2) {
+            int sum = sim.board[i].redSeed 
+                    + sim.board[i].blueSeed 
+                    + sim.board[i].transSeed;
+
+            bool dangerAfter = (sum == 2 || sum == 3);
+
+            // si dangereux avant mais plus après --> blocage
+            if (dangerBefore[i] && !dangerAfter) {
+                blocked++;
+            }
+        }
+
+        if (blocked > bestBlock)
+            bestBlock = blocked;
+    }
+
+    return bestBlock;
+}
 
 int potentialCaptures(struct GameState* game){
     int potential = 0;
