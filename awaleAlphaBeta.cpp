@@ -8,6 +8,7 @@
 
 #define BOARDSIZE 16
 #define SEED_LIMIT 16
+#define GAME_LIMIT 400
 
 // Structure definition
 struct hole {
@@ -58,8 +59,11 @@ int main() {
     GameState game;
     initGameState(&game);
 
-    while (true) {
+    int count = 0;
+    while (count < GAME_LIMIT) {
         play(&game);
+        count++;
+        std::cout << "\nMove counter: " << count << "\n" << std::endl;
 
         if (game.countJ1 >= 49) {
             std::cout << "[J1] Win with " << game.countJ1 << " seeds vs " << game.countJ2 << " seeds for [J2]." << std::endl;
@@ -742,16 +746,16 @@ int findBestPmax(GameState* game) {
     static float seedMaxQte = 3.*2*BOARDSIZE;
     float removePercent = 1 - (float)game->countSeed/seedMaxQte;
     if (removePercent < 0.15) {
-        return 4;
-    } else if (removePercent < 0.30) {
         return 5;
-    } else if (removePercent < 0.5) {
+    } else if (removePercent < 0.30) {
         return 6;
+    } else if (removePercent < 0.5) {
+        return 7;
     } else if (removePercent < 0.7) {
-        return 7;
-    } else if (removePercent < 0.8) {
-        return 7;
-    } else {
         return 8;
+    } else if (removePercent < 0.8) {
+        return 9;
+    } else {
+        return 10;
     }
 }

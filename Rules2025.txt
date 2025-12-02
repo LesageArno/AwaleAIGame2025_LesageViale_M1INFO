@@ -16,7 +16,7 @@ Players take turns moving the seeds. On a turn, a player chooses one of the heig
 Moves are made according to colors. First a color is designed and all the seeds of this color are played, 
 If the seeds are red, then they are distributed in each hole. If the seeds are blue, then they are distributed only in the opponent's holes. If transparent color is selected then the player has to decide if they are played like red or like blue. Then they are played with the other seeds of the same color. BE CAREFUL: transparent remains transparent and are distributed first (that is before the other seeds of the designated color).
 
-Seeds are not distributed into the hole drawn from. The starting hole is always left empty for the selected color; if a clock turn is made then the skipped, and the seed is placed in the next hole. 
+Seeds are not distributed into the hole drawn from. The starting hole is always left empty for the selected color; if a clock turn is made then the initial hole is skipped, and the seed is placed in the next hole. 
 Thus, a move is expressed by NC if Bor R seeds are played where N is the number of the hole, C is the color which is played
 For instance, 3R means that we play the red seeds of hole 3 (and only the red) 
 If a transparent color is played then the move is expressed by NTC. 4TR means that the transparent seeds are considered as red and they are played with the other reds
@@ -28,7 +28,7 @@ Taking all the seeds of the opponent is allowed. In case of starving all the see
 The game stops when there is strictly less than 10 seeds on the board. In this case, the remaining seeds are not take into account.
 
 -- Winning
-The game is over when one player has captured 49 or more seeds, or each player has taken 40 seeds (draw), or there is only strictly less than 10 seeds that remain. The winner is the player who has more seeds than his opponent.
+The game is over when one player has captured 49 or more seeds, or there is only strictly less than 10 seeds that remain. The winner is the player who has more seeds than his opponent.
 
 
 

@@ -7,6 +7,7 @@
 
 #define BOARDSIZE 16
 #define SEED_LIMIT 16
+#define GAME_LIMIT 400
 
 // Structure definition
 struct hole {
@@ -54,8 +55,11 @@ int main() {
     GameState game;
     initGameState(&game);
 
-    while (true) {
+    int count = 0;
+    while (count < GAME_LIMIT) {
         play(&game);
+        count++;
+        std::cout << "\nMove counter: " << count << "\n" << std::endl;
 
         if (game.countJ1 >= 49) {
             std::cout << "[J1] Win with " << game.countJ1 << " seeds vs " << game.countJ2 << " seeds for [J2]." << std::endl;
@@ -538,7 +542,6 @@ GameState Apply(GameState game, std::string move) {
 
 }
 
-
 float evaluate(struct GameState* game){
     struct hole* board = game->board;
     float score = 0.0f;
@@ -595,8 +598,6 @@ float evaluate(struct GameState* game){
 
     return score;
 }
-
-
 
 int potentialCaptures(struct GameState* game){
     int potential = 0;
@@ -661,7 +662,6 @@ int potentialCaptures(struct GameState* game){
 
     return potential;
 }
-
 
 float MinMax(GameState game, bool isMax, int pmax) {
     GameState gameCopy = game;
