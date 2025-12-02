@@ -66,16 +66,13 @@ int main() {
         } else if (game.countJ2 >= 49) {
             std::cout << "[J2] Win with " << game.countJ2 << " seeds vs " << game.countJ1 << " seeds for [J1]." << std::endl;
             break;
-        } else if ((game.countJ1 >= 40) && (game.countJ2 >= 40)) {
-            std::cout << "Draw for [J1] and [J2] with 40 seeds each." << std::endl;
-            break;
-        } else if (game.countSeed < 10) {
+        } else if (game.countSeed < 16) {
             if (game.countJ1 > game.countJ2) {
-                std::cout << "[J1] Win (by 10 seed limit) with " << game.countJ1 << " seeds vs " << game.countJ2 << " seeds for [J2]." << std::endl;
+                std::cout << "[J1] Win (by 16 seed limit) with " << game.countJ1 << " seeds vs " << game.countJ2 << " seeds for [J2]." << std::endl;
             } else if (game.countJ1 == game.countJ2) {
-                std::cout << "Draw (by 10 seed limit) for [J1] and [J2] with " << game.countJ1 << " seeds each." << std::endl;
+                std::cout << "Draw (by 16 seed limit) for [J1] and [J2] with " << game.countJ1 << " seeds each." << std::endl;
             } else if (game.countJ1 < game.countJ2) {
-                std::cout << "[J2] Win (by 10 seed limit) with " << game.countJ2 << " seeds vs " << game.countJ1 << " seeds for [J1]." << std::endl;
+                std::cout << "[J2] Win (by 16 seed limit) with " << game.countJ2 << " seeds vs " << game.countJ1 << " seeds for [J1]." << std::endl;
             }
             break;
         }
@@ -500,13 +497,8 @@ bool isJ1Loosing(struct GameState* game) {
 }
 
 bool isDraw(struct GameState* game) {
-    // If more than 40 seed recolted each, then draw
-    if ((game->countJ1 >= 40) && (game->countJ2 >= 40)) {
-        return true;
-    }
-
     // If J1 equal J2 the majority of the seed when less than 10 seed, loose
-    if ((game->countSeed < 10) && (game->countJ1 == game->countJ2)) {
+    if ((game->countSeed < 16) && (game->countJ1 == game->countJ2)) {
         return true;
     }
 
