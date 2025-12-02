@@ -6,6 +6,8 @@
 #include <map>
 
 #define BOARDSIZE 16
+#define SEED_LIMIT 16
+#define GAME_LIMIT 400
 
 // Structure definition
 struct hole {
@@ -53,8 +55,11 @@ int main() {
     GameState game;
     initGameState(&game);
 
-    while (true) {
+    int count = 0;
+    while (count < GAME_LIMIT) {
         play(&game);
+        count++;
+        std::cout << "\nMove counter: " << count << "\n" << std::endl;
 
         if (game.countJ1 >= 49) {
             std::cout << "[J1] Win with " << game.countJ1 << " seeds vs " << game.countJ2 << " seeds for [J2]." << std::endl;
@@ -62,16 +67,13 @@ int main() {
         } else if (game.countJ2 >= 49) {
             std::cout << "[J2] Win with " << game.countJ2 << " seeds vs " << game.countJ1 << " seeds for [J1]." << std::endl;
             break;
-        } else if ((game.countJ1 >= 40) && (game.countJ2 >= 40)) {
-            std::cout << "Draw for [J1] and [J2] with 40 seeds each." << std::endl;
-            break;
-        } else if (game.countSeed < 10) {
+        } else if (game.countSeed < SEED_LIMIT) {
             if (game.countJ1 > game.countJ2) {
-                std::cout << "[J1] Win (by 10 seed limit) with " << game.countJ1 << " seeds vs " << game.countJ2 << " seeds for [J2]." << std::endl;
+                std::cout << "[J1] Win (by 16 seed limit) with " << game.countJ1 << " seeds vs " << game.countJ2 << " seeds for [J2]." << std::endl;
             } else if (game.countJ1 == game.countJ2) {
-                std::cout << "Draw (by 10 seed limit) for [J1] and [J2] with " << game.countJ1 << " seeds each." << std::endl;
+                std::cout << "Draw (by 16 seed limit) for [J1] and [J2] with " << game.countJ1 << " seeds each." << std::endl;
             } else if (game.countJ1 < game.countJ2) {
-                std::cout << "[J2] Win (by 10 seed limit) with " << game.countJ2 << " seeds vs " << game.countJ1 << " seeds for [J1]." << std::endl;
+                std::cout << "[J2] Win (by 16 seed limit) with " << game.countJ2 << " seeds vs " << game.countJ1 << " seeds for [J1]." << std::endl;
             }
             break;
         }
@@ -486,13 +488,9 @@ bool isJ1Loosing(struct GameState* game) {
 }
 
 bool isDraw(struct GameState* game) {
-    // If more than 40 seed recolted each, then draw
-    if ((game->countJ1 >= 40) && (game->countJ2 >= 40)) {
-        return true;
-    }
 
     // If J1 equal J2 the majority of the seed when less than 10 seed, loose
-    if ((game->countSeed < 10) && (game->countJ1 == game->countJ2)) {
+    if ((game->countSeed < SEED_LIMIT) && (game->countJ1 == game->countJ2)) {
         return true;
     }
 
@@ -533,7 +531,6 @@ GameState Apply(GameState game, std::string move) {
     return gameCopy;
 
 }
-
 
 float evaluate(struct GameState* game){
     struct hole* board = game->board;
@@ -762,7 +759,6 @@ int potentialCaptures(struct GameState* game){
 
     return potential;
 }
-
 
 float MinMax(GameState game, bool isMax, int pmax) {
     GameState gameCopy = game;
