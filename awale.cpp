@@ -80,6 +80,7 @@ void initHole(struct hole* board) {
         board[i].transSeed = 2;
     }
 }
+
 void initGameState(GameState* game) {
     initHole(game->board);
 
@@ -205,6 +206,10 @@ int playRed(int moveFrom, bool trans, struct GameState* game) {
 
     // Loop until no more seed are to place
     while ((transPlace > 0) || (redPlace > 0)) {
+        if (moveFrom-1==currentPosition) {
+            currentPosition = (currentPosition + 1)%BOARDSIZE;
+        }
+
         // Place transparent first then red
         if (transPlace > 0) {
             transPlace--;

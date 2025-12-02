@@ -222,6 +222,10 @@ int playRed(int moveFrom, bool trans, struct GameState* game) {
 
     // Loop until no more seed are to place
     while ((transPlace > 0) || (redPlace > 0)) {
+        if (moveFrom-1==currentPosition) {
+            currentPosition = (currentPosition + 1)%BOARDSIZE;
+        }
+
         // Place transparent first then red
         if (transPlace > 0) {
             transPlace--;
@@ -544,7 +548,6 @@ GameState Apply(GameState game, std::string move) {
 
 }
 
-
 float evaluate(struct GameState* game){
     struct hole* board = game->board;
     float score = 0.0f;
@@ -601,7 +604,6 @@ float evaluate(struct GameState* game){
 
     return score;
 }
-
 
 int potentialCaptures(struct GameState* game){
     int potential = 0;
@@ -667,7 +669,6 @@ int potentialCaptures(struct GameState* game){
     return potential;
 }
 
-
 float AlphaBeta(GameState game, float alpha, float beta, int depth) {
     // J1 is always maximizing
     bool isMax = game.playJ1; 
@@ -708,7 +709,6 @@ float AlphaBeta(GameState game, float alpha, float beta, int depth) {
     }
 }
 
-
 std::string DecisionAlphaBeta(GameState* game, int depth) {
     float alpha = -2.0f;
     float beta  =  2.0f;
@@ -728,7 +728,7 @@ std::string DecisionAlphaBeta(GameState* game, int depth) {
             if (val > bestVal) {
                 bestVal = val;
                 bestMove = move;
-                std::cout << bestMove << " : " << bestVal << std::endl;
+                //std::cout << bestMove << " : " << bestVal << std::endl;
             }
             alpha = std::max(alpha, bestVal);
         }
@@ -736,7 +736,7 @@ std::string DecisionAlphaBeta(GameState* game, int depth) {
             if (val < bestVal) {
                 bestVal = val;
                 bestMove = move;
-                std::cout << bestMove << " : " << bestVal << std::endl;
+                //std::cout << bestMove << " : " << bestVal << std::endl;
             }
             beta = std::min(beta, bestVal);
         }
@@ -744,7 +744,6 @@ std::string DecisionAlphaBeta(GameState* game, int depth) {
 
     return bestMove;
 }
-
 
 int findBestPmax(GameState* game) {
     static float seedMaxQte = 3.*2*BOARDSIZE;
