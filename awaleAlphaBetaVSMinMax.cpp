@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #define BOARDSIZE 16
+#define SEED_LIMIT 16
 
 // Structure definition
 struct hole {
@@ -65,7 +66,7 @@ int main() {
         } else if (game.countJ2 >= 49) {
             std::cout << "[J2] Win with " << game.countJ2 << " seeds vs " << game.countJ1 << " seeds for [J1]." << std::endl;
             break;
-        } else if (game.countSeed < 16) {
+        } else if (game.countSeed < SEED_LIMIT) {
             if (game.countJ1 > game.countJ2) {
                 std::cout << "[J1] Win (by 16 seed limit) with " << game.countJ1 << " seeds vs " << game.countJ2 << " seeds for [J2]." << std::endl;
             } else if (game.countJ1 == game.countJ2) {
@@ -497,7 +498,7 @@ bool isJ1Loosing(struct GameState* game) {
 
 bool isDraw(struct GameState* game) {
     // If J1 equal J2 the majority of the seed when less than 10 seed, loose
-    if ((game->countSeed < 16) && (game->countJ1 == game->countJ2)) {
+    if ((game->countSeed < SEED_LIMIT) && (game->countJ1 == game->countJ2)) {
         return true;
     }
 
