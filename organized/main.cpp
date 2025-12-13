@@ -2,23 +2,28 @@
 #include "rules/Rules.h"
 #include "players/Player.h"
 #include "players/HumanPlayer.h"
-// plus tard : #include "players/AlphaBetaPlayer.h"
+#include "players/MinMaxPlayer.h"
+
+/* POUR COMPILER */
+//g++ -O2 main.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp -o awale.exe
+//g++ -O2 main.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp -o awale.exe
 
 int main() {
 
     GameState game;
     initGameState(&game);
+    bool verbose = true;
 
     // === Création des joueurs ===
-    Player* player1 = new HumanPlayer(true);   // J1
-    Player* player2 = new HumanPlayer(false);  // J2
-    // exemples futurs :
-    // Player* player2 = new AlphaBetaPlayer(false, 6);
+    //Player* player1 = new HumanPlayer(true);   // J1
+    //Player* player2 = new HumanPlayer(false);  // J2
+    Player* player1 = new MinMaxPlayer(true, 3);
+    Player* player2 = new MinMaxPlayer(false, 3);
 
     // === Boucle principale ===
     while (true) {
 
-        printBoard(&game);
+        if (verbose) printBoard(&game);
 
         Player* currentPlayer = game.playJ1 ? player1 : player2;
         std::string move = currentPlayer->chooseMove(&game);

@@ -21,7 +21,6 @@ void printBoard(const GameState* game) {
     std::cout << "|" << std::endl << "|--------|--------|--------|--------|--------|--------|--------|--------|" << std::endl;
     std::cout << "Score: [J1] " << game->countJ1 << " vs [J2] " << game->countJ2 << std::endl;
 }
-
 // State representation method
 void printState(const GameState* game) {
     const hole* board = game->board;
@@ -72,7 +71,6 @@ int playRed(int moveFrom, bool trans, struct GameState* game) {
     // Return last position + 1 to return in range 1-16
     return currentPosition + 1;
 }
-
 // Play blue function
 int playBlue(int moveFrom, bool trans, struct GameState* game) {
     // Add blue seed to the sum
@@ -148,7 +146,6 @@ bool checkMoveValidity(int moveFrom, std::string moveSeed, struct GameState* gam
     // Illegal seed
     return false;
 }
-
 // Check if any available move.
 bool checkAvailableMove(struct GameState* game) {
     for (int i = 0; i < BOARDSIZE; i++) {
@@ -213,7 +210,6 @@ void capture(int lastMove, struct GameState* game, bool verbose) {
         counter++;
     }
 }
-
 // Retrieve seed for opposite player when starving
 int starvingCapture(struct GameState* game) {
     int seedCount = 0;
