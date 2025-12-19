@@ -3,10 +3,10 @@
 #include "players/Player.h"
 #include "players/HumanPlayer.h"
 #include "players/MinMaxPlayer.h"
+#include "players/AlphaBetaPlayer.h"
 
 /* POUR COMPILER */
-//g++ -O2 main.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp -o awale.exe
-//g++ -O2 main.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp -o awale.exe
+//g++ -O2 main.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awale.exe
 
 int main() {
 
@@ -17,8 +17,11 @@ int main() {
     // === Création des joueurs ===
     //Player* player1 = new HumanPlayer(true);   // J1
     //Player* player2 = new HumanPlayer(false);  // J2
-    Player* player1 = new MinMaxPlayer(true, 3);
-    Player* player2 = new MinMaxPlayer(false, 3);
+    //Player* player1 = new MinMaxPlayer(true, 3);
+    //Player* player2 = new MinMaxPlayer(false, 3);
+    Player* player1 = new AlphaBetaPlayer(true, 6);
+    Player* player2 = new AlphaBetaPlayer(false, 6);
+
 
     // === Boucle principale ===
     while (true) {

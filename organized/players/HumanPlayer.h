@@ -11,6 +11,7 @@ public:
 
 private:
     bool isJ1;
+    bool verbose;
 };
 
 #endif

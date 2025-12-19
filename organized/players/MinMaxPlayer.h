@@ -12,6 +12,7 @@ public:
 private:
     bool isJ1;
     int pmax; // profondeur MinMax
+    bool verbose;
 };
 
 #endif
