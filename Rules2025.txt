@@ -30,7 +30,7 @@ The game stops when there is strictly less than 10 seeds on the board. In this c
 -- Winning
 The game is over when one player has captured 49 or more seeds, or there is only strictly less than 10 seeds that remain. The winner is the player who has more seeds than his opponent.
 
-
+The game has a maximum of 400 moves. If a player plays the 400th move then the game is stopped and the winner is the player who has more seeds than his opponent.
 
 examples:
  
@@ -75,5 +75,6 @@ Holes 1, 16, 15 are captured 2+3+2=7 seeds are captured
 The result is:
 1 () 2 (2B) 3(1B) 4(2B) 5(1R)
 16 () 15 () 14 (4B)
- 
+
+RESULT coup scoreJ1 scoreJ2
 

@@ -6,25 +6,33 @@
 #include "players/AlphaBetaPlayer.h"
 
 /* POUR COMPILER */
-//g++ -O2 main.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awale.exe
+//g++ -O2 mainCompet.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awale.exe
 
 // Maximum number of move (to implement)
 #define MOVELIMIT 400
 
 int main() {
 
+    // Buffer management
+    // https://www.programiz.com/cpp-programming/buffer
+    const int bufferSize = 1024;
+    char *buffer = new char[bufferSize]; 
+    
+
+
     GameState game;
     initGameState(&game);
     bool verbose = true;
     int moveCount = 0;
 
+
     // === Création des joueurs ===
     //Player* player1 = new HumanPlayer(true);   // J1
-    Player* player2 = new HumanPlayer(false);  // J2
+    //Player* player2 = new HumanPlayer(false);  // J2
     //Player* player1 = new MinMaxPlayer(true, 3);
     //Player* player2 = new MinMaxPlayer(false, 3);
     Player* player1 = new AlphaBetaPlayer(true, 6);
-    //Player* player2 = new AlphaBetaPlayer(false, 6);
+    Player* player2 = new AlphaBetaPlayer(false, 6);
 
 
     // === Boucle principale ===
@@ -64,7 +72,7 @@ int main() {
             break;
         }
 
-        if ((game.countSeed < SEED_LIMIT) || (moveCount >= MOVELIMIT)) {
+        if (game.countSeed < SEED_LIMIT || moveCount >= MOVELIMIT) {
             if (game.countJ1 > game.countJ2)
                 std::cout << "[J1] wins by seed limit\n";
             else if (game.countJ2 > game.countJ1)

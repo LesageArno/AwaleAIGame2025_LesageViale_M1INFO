@@ -120,7 +120,7 @@ bool checkMoveValidity(int moveFrom, std::string moveSeed, struct GameState* gam
     }
 
     // Check if redSeed are remaining in the hole
-    if (moveSeed=="r") {
+    if (moveSeed=="R") {
         if (game->board[moveFrom-1].redSeed==0) {
             return false;
         }
@@ -128,7 +128,7 @@ bool checkMoveValidity(int moveFrom, std::string moveSeed, struct GameState* gam
     }
 
     // Check if blueSeed are remaining in the hole
-    if (moveSeed=="b") {
+    if (moveSeed=="B") {
         if (game->board[moveFrom-1].blueSeed==0) {
             return false;
         }
@@ -136,7 +136,7 @@ bool checkMoveValidity(int moveFrom, std::string moveSeed, struct GameState* gam
     }
 
     // Check if transSeed are remaining in the hole
-    if ((moveSeed=="tr") || (moveSeed=="tb")) {
+    if ((moveSeed=="TR") || (moveSeed=="TB")) {
         if (game->board[moveFrom-1].transSeed==0) {
             return false;
         }
@@ -244,16 +244,16 @@ GameState Apply(GameState game, std::string move) {
     int lastPos;
 
     // === Semis ===
-    if (color == "r") {
+    if (color == "R") {
         lastPos = playRed(moveFrom, false, &gameCopy);
     }
-    else if (color == "tr") {
+    else if (color == "TR") {
         lastPos = playRed(moveFrom, true, &gameCopy);
     }
-    else if (color == "b") {
+    else if (color == "B") {
         lastPos = playBlue(moveFrom, false, &gameCopy);
     }
-    else if (color == "tb") {
+    else if (color == "TB") {
         lastPos = playBlue(moveFrom, true, &gameCopy);
     }
 

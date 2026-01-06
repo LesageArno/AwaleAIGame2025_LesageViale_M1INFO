@@ -7,14 +7,14 @@ std::vector<std::string> possibleMove(struct GameState* game) {
     for (int i = 0; i < BOARDSIZE; i++) {
         if ((game->playJ1 && (game->board[i].id%2 == 1)) || (!game->playJ1 && (game->board[i].id%2 == 0))) {
             if (game->board[i].redSeed != 0) {
-                possible_move.push_back(std::to_string(i+1) + " r");
+                possible_move.push_back(std::to_string(i+1) + " R");
             }
             if (game->board[i].blueSeed != 0) {
-                possible_move.push_back(std::to_string(i+1) + " b");
+                possible_move.push_back(std::to_string(i+1) + " B");
             }
             if (game->board[i].transSeed != 0) {
-                possible_move.push_back(std::to_string(i+1) + " tr");
-                possible_move.push_back(std::to_string(i+1) + " tb");
+                possible_move.push_back(std::to_string(i+1) + " TR");
+                possible_move.push_back(std::to_string(i+1) + " TB");
             }
         }
     }
@@ -37,6 +37,7 @@ bool isJ1Winning(struct GameState* game) {
     // Else do not win
     return false;
 }
+
 bool isJ1Loosing(struct GameState* game) {
     // If J2 has the absolute majority of the seed, loose 
     if (game->countJ2 >= 49) {
@@ -53,6 +54,7 @@ bool isJ1Loosing(struct GameState* game) {
     // Else do not loose
     return false;
 }
+
 bool isDraw(struct GameState* game) {
     // If J1 equal J2 the majority of the seed when less than 10 seed, loose
     if ((game->countSeed < SEED_LIMIT) && (game->countJ1 == game->countJ2)) {
@@ -119,6 +121,7 @@ float evaluate(struct GameState* game){
 
     return score;
 }
+
 int potentialCaptures(struct GameState* game){
     int potential = 0;
 

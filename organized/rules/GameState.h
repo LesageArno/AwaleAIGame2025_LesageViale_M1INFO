@@ -2,7 +2,7 @@
 #define GAMESTATE_H
 
 #define BOARDSIZE 16
-#define SEED_LIMIT 16
+#define SEED_LIMIT 10
 
 struct hole {
     int id;
