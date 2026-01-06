@@ -17,7 +17,7 @@ int main() {
     // https://www.programiz.com/cpp-programming/buffer
     const int bufferSize = 1024;
     char *buffer = new char[bufferSize]; 
-    
+
 
 
     GameState game;
@@ -85,5 +85,6 @@ int main() {
 
     delete player1;
     delete player2;
+    delete[] buffer;
     return 0;
 }
