@@ -5,6 +5,8 @@
 #include <vector>
 #include "../rules/GameState.h"
 
+#define EVALUATION_FUNC "corrected" // "raw", "corrected", "defence"
+
 // Fonctions communes aux IA
 std::vector<std::string> possibleMove(GameState* game);
 
@@ -14,6 +16,8 @@ bool isDraw(GameState* game);
 
 int potentialCaptures(GameState* game);
 float evaluate(GameState* game);
-float evaluate2(GameState* game);
+float evaluatePotentialCaptureFixed(GameState* game);
+float evaluateDefence(GameState* game);
+
 
 #endif

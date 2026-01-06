@@ -39,7 +39,15 @@ float AlphaBeta(GameState game, float alpha, float beta, int depth) {
     if (isJ1Winning(&game)) return 1.0f;
     if (isJ1Loosing(&game)) return -1.0f;
     if (isDraw(&game)) return 0.0f;
-    if (depth == 0) return evaluate(&game); // Always from J1's perspective
+    if (depth == 0) {
+        if (EVALUATION_FUNC == "raw") {
+            return evaluate(&game); // Always from J1's perspective
+        } else if (EVALUATION_FUNC == "corrected") {
+            return evaluatePotentialCaptureFixed(&game);
+        } else if (EVALUATION_FUNC == "defence") {
+            return evaluateDefence(&game);
+        }
+    }    
 
     // Handle starvation
     if (!checkAvailableMove(&game)) {
