@@ -14,5 +14,6 @@ bool isDraw(GameState* game);
 
 int potentialCaptures(GameState* game);
 float evaluate(GameState* game);
+float evaluate2(GameState* game);
 
 #endif
