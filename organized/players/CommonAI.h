@@ -5,7 +5,12 @@
 #include <vector>
 #include "../rules/GameState.h"
 
-#define EVALUATION_FUNC "corrected" // "raw", "corrected", "defence"
+#define J1_EVALUATION_FUNC "corrected" // "raw", "corrected", "defence"
+#define J2_EVALUATION_FUNC "corrected" // "raw", "corrected", "defence"
+
+// Variable to keep track of the shortest path to capture
+extern int winJ1in;
+extern int winJ2in;
 
 // Fonctions communes aux IA
 std::vector<std::string> possibleMove(GameState* game);

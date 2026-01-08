@@ -68,11 +68,11 @@ float MinMaxRec(GameState game, bool isMax, int depth) {
     if (isJ1Loosing(&game)) return -1.0f;
     if (isDraw(&game)) return 0.0f;
     if (depth == 0) {
-        if (EVALUATION_FUNC == "raw") {
+        if (((J1_EVALUATION_FUNC == "raw") && isMax) || ((J2_EVALUATION_FUNC == "raw") && !isMax)) {
             return evaluate(&game); // Always from J1's perspective
-        } else if (EVALUATION_FUNC == "corrected") {
+        } else if (((J1_EVALUATION_FUNC == "corrected") && isMax) || ((J2_EVALUATION_FUNC == "corrected") && !isMax)) {
             return evaluatePotentialCaptureFixed(&game);
-        } else if (EVALUATION_FUNC == "defence") {
+        } else if (((J1_EVALUATION_FUNC == "defence") && isMax) || ((J2_EVALUATION_FUNC == "defence") && !isMax)) {
             return evaluateDefence(&game);
         }
     }

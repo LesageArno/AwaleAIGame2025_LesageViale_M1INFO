@@ -21,10 +21,12 @@ int main() {
     // === Création des joueurs ===
     //Player* player1 = new HumanPlayer(true);   // J1
     //Player* player2 = new HumanPlayer(false);  // J2
-    //Player* player1 = new MinMaxPlayer(true, 3);
-    Player* player2 = new MinMaxPlayer(false, 3);
-    Player* player1 = new AlphaBetaPlayer(true, 6); 
-    //Player* player2 = new AlphaBetaPlayer(false, 6);
+    //Player* player1 = new MinMaxPlayer(true, 3); // MinMaxJ1
+    //Player* player2 = new MinMaxPlayer(false, 3); // MinMaxJ2
+    //Player* player1 = new AlphaBetaPlayer(true, 6); //AlphaBetaJ1
+    //Player* player2 = new AlphaBetaPlayer(false, 6); //AlphaBetaJ2
+    Player* player1 = new AlphaBetaPlayer(true, -1); //AdaptativeAlphaBetaJ1
+    Player* player2 = new AlphaBetaPlayer(false, -1); //AdaptativeAlphaBetaJ2
 
 
     // === Boucle principale ===

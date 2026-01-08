@@ -21,7 +21,7 @@ std::string AlphaBetaPlayer::chooseMove(GameState* game) {
         return "-";
     }
 
-    std::string move = DecisionAlphaBeta(game, pmax);
+    std::string move = DecisionAlphaBeta(game, pmax==-1 ? findBestPmax(game) : pmax);
 
     if (verbose)
         std::cout << (isJ1 ? "[J1]" : "[J2]") 
@@ -40,11 +40,11 @@ float AlphaBeta(GameState game, float alpha, float beta, int depth) {
     if (isJ1Loosing(&game)) return -1.0f;
     if (isDraw(&game)) return 0.0f;
     if (depth == 0) {
-        if (EVALUATION_FUNC == "raw") {
+        if (((J1_EVALUATION_FUNC == "raw") && isMax) || ((J2_EVALUATION_FUNC == "raw") && !isMax)) {
             return evaluate(&game); // Always from J1's perspective
-        } else if (EVALUATION_FUNC == "corrected") {
+        } else if (((J1_EVALUATION_FUNC == "corrected") && isMax) || ((J2_EVALUATION_FUNC == "corrected") && !isMax)) {
             return evaluatePotentialCaptureFixed(&game);
-        } else if (EVALUATION_FUNC == "defence") {
+        } else if (((J1_EVALUATION_FUNC == "defence") && isMax) || ((J2_EVALUATION_FUNC == "defence") && !isMax)) {
             return evaluateDefence(&game);
         }
     }    
@@ -120,10 +120,8 @@ int findBestPmax(GameState* game) {
     static float seedMaxQte = 3.*2*BOARDSIZE;
     float removePercent = 1 - (float)game->countSeed/seedMaxQte;
     if (removePercent < 0.15) {
-        return 5;
-    } else if (removePercent < 0.30) {
         return 6;
-    } else if (removePercent < 0.5) {
+    } else if (removePercent < 0.30) {
         return 7;
     } else if (removePercent < 0.7) {
         return 8;
