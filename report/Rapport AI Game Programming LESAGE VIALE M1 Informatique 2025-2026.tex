@@ -1,0 +1,191 @@
+% ---------------------------------------------------------------
+% ---------------------------------------------------------------
+% This template was developed for the working paper series of 
+% the Interdisciplinary Laboratory of Computational Social Science (iLCSS)
+% at the University of Maryland, College Park
+
+% The template was built based on  the PNAS Latex model. 
+
+% Adjustments were made by Tiago Ventura, Ph.D. Candidate in Political Science at UMD, and researcher at the iLCSS.
+
+\documentclass[9pt,twocolumn,twoside]{ilcss}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage[dvipsnames]{xcolor}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Définition}[section]
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remarque}[section]
+
+\theoremstyle{definition}
+\newtheorem*{goal}{Objectif}
+
+\theoremstyle{definition}
+\newtheorem*{hypothesis}{Hypothèse}
+
+\templatetype{ilcssworkingpaper} % Choose template 
+
+\title{AI Game Programming : Awalé, où comment jouer automatiquement}	
+
+% Use letters for affiliations, numbers to show equal authorship (if applicable) and to indicate the corresponding author
+\author[a,b]{Arno Lesage (no. 22202985)}
+\author[a,c]{Jean-Jacques Viale (no. 22202859)}
+
+\affil[a]{Université Côte d'Azur EUR - DS4H}
+\affil[b]{Master 1 Informatique, parcours IA}
+\affil[c]{Master 1 Informatique, parcours Informatique}
+
+% Please include corresponding author, author contribution and author declaration information
+\authordeclaration{Template \LaTeX{} utilisé : iLCSS Working Paper Template par Ernesto Calvo et Tiago Ventura sous licence Creative Commons CC BY 4.0.}
+
+% Keywords are not mandatory, but authors are strongly encouraged to provide them. If provided, please include two to five keywords, separated by the pipe symbol, e.g:
+\keywords{Awalé $|$ MinMax $|$ Coupe Alpha Beta $|$ Fonction d'évaluation}
+
+%\begin{abstract}
+%    PACMAN est un jeu d'arcade composé d'un labyrinthe et d'agents parcourant celui-ci : des fantômes et PacMan, un agent contrôlable humainement. Le but de PacMan est d'explorer l'entièreté du labyrinthe et celui des fantômes de le capturer le plus rapidement possible. Ce jeu, à la logique simple, présente pourtant des défis complexes incluant entre autres la génération procédurale de labyrinthes à propriétés spécifiques ou le développement d'agents autonomes pour les fantômes et PacMan. Ce rapport mets en évidence plusieurs techniques répondant à ces problématiques aussi bien dans la génération des labyrinthes grâce aux polyominos que dans les agents autonomes avec des approches diversifiées parfois collaborative, le tout en précisant les détails d'implémentation technique nécessaires ou facilitant la production et l'implémentation de simulations.
+%\end{abstract}
+
+\begin{abstract}
+    L'Awalé...
+\end{abstract}
+
+%\begin{abstract}
+%Please provide an abstract of no more than 250 words in a single paragraph. Abstracts should explain to the general reader the major contributions of the article. References in the abstract must be cited in full within the abstract itself and cited in the text.
+%\end{abstract}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firststyle}
+\ifthenelse{\boolean{shortarticle}}{\ifthenelse{\boolean{singlecolumn}}{\abscontentformatted}{\abscontent}}{}
+
+% If your first paragraph (i.e. with the \dropcap) contains a list environment (quote, quotation, theorem, definition, enumerate, itemize...), the line after the list may have some extra indentation. If this is the case, add \parshape=0 to the end of the list environment.
+
+
+
+%\section*{Introduction}
+    \dropcap{L'}Awalé...
+\section{Présentation et règles du jeu}
+
+L'Awalé est un jeu de plateau et de stratégie tour-à-tour à deux joueurs d'origine Africaine datant du VIIIème siècle \cite{Juliette2006}. Le jeu se compose de deux composant : 
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Un plateau constitué de trous,
+    \item Des graines.
+\end{itemize}
+
+Au delà des règles traditionnelles variants de régions en régions, nous détaillerons dans la suite des règles adaptées, ajoutées et/ou simplifiées à des fins d'automatisations.
+
+\subsubsection*{Plateau et graines} 
+Dans cette version modifiée de l'Awalé, nous utiliserons un plateau composé de 16 trous numérotés de 1 à 16. Les trous impairs appartiennent au premier joueur \texttt{[J1]} et les trous pairs au deuxième joueur \texttt{[J2]}. Les graines, au nombre de 96, sont réparties de manière égale entre trois couleurs : rouge, bleu et transparent.
+
+\subsubsection*{Début de la partie} 
+Au début de la partie, deux graines de chaque couleur sont attribuées dans chaque trous du plateau. \texttt{[J1]} commence.
+
+\subsubsection*{Déroulé de la partie}
+Au tour de \texttt{[J1]}, \texttt{[J1]} choisi un trou lui appartenant et peut exécuté l'une des actions suivantes (sous réserver que les graines concernées soient dans le trou sélectionné) :
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Jouer les graines rouges \texttt{[r]},
+    \item Jouer les graines bleues \texttt{[b]},
+    \item Jouer les graines transparentes en tant que graines rouges \texttt{[tr]},
+    \item Jouer les graines transparentes en tant que graines bleues \texttt{[tb]}.
+\end{itemize}
+Si \texttt{[J1]} ne peut pas jouer à partir de ces trous à son tour, alors nous sommes dans une situation de famine, le tour de \texttt{[J1]} est passé et \texttt{[J2]} récupère l'ensemble des graines du plateau. 
+Une fois son coup joué, \texttt{[J2]} joue de la même manière et rends la main à \texttt{[J1]}.
+\begin{remark}
+    Un coup est noté \texttt{Nc} où \texttt{N} est le numéro du trou joué et $\texttt{c}\in\{\texttt{r},\texttt{b},\texttt{tr},\texttt{tb}\}$.
+\end{remark}
+
+\subsubsection*{Essaimage}
+L'essaimage correspond au mécanisme à travers lequel les graines sont jouées. 
+Ainsi, une fois jouées, les graines rouges sont supprimés du trou sélectionné et sont réparties une à une dans les trous suivants en ordre croissant.
+Les graines bleues suivent un mécanisme similaire, mais ne répartissent les graines que dans les trous ne lui appartenant pas.
+Enfin, les graines transparentes peuvent êtres jouées soit comme les graines rouges soit comme les graines bleues.   
+\begin{remark}
+    Le trou suivant le trou numéro 16 est le trou numéro 1.
+\end{remark}
+\begin{remark}
+    Si un graine transparente est joué, alors les graines de la couleur sélectionnée sont aussi jouées. Ainsi $\left(\texttt{Play[tr]} \Rightarrow \texttt{Play[r]}\right) \land \left(\texttt{Play[tb]}\Rightarrow\texttt{Play[b]}\right)$. Si les graines de couleur correspondante ne se trouvent pas dans le trou sélectionné, alors les graines transparentes sont jouées sans impacts sur les autres couleurs. 
+\end{remark}
+\begin{remark}
+    Si l'essaimage parvient à revenir sur le trou sélectionné, alors celui-ci est sauté et l'essaimage continue sur le trou suivant.
+\end{remark}
+
+\subsubsection*{Capture des graines} À la fin de l'essaimage, le trou ayant reçu la dernière graine est vérifié. Si ce trou contient deux ou trois graines, alors la récolte commence et le joueur ayant fait l'essaimage récolte les graines contenu dans le trou et répète l'action pour tous les trous précédents (en ordre décroissant) jusqu'à ce que la condition ne soit plus vérifiée.
+
+\subsubsection*{Fin de la partie} La fin de la partie peut arriver de plusieurs manières :
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item \textbf{Limite de coup :} Si 400 coups ont été exécutés (200 coups par joueur), alors la partie s'arrête et le joueur ayant le plus de graine remporte la partie.
+    \item \textbf{Limite de graine :} S'il y a moins de dix graines sur le plateau, alors la partie s'arrête et le joueur ayant le plus de graine remporte la partie.
+    \item \textbf{Victoire :} Si un joueur a récolté au moins 49 graines, alors le joueur gagne la partie.
+    \item \textbf{Égalité :} Dans le cas où la limite de coup ou la limite de graine est dépassée, si aucun joueurs ne domine, alors il y a égalité.
+\end{itemize}
+
+\section{Implémentation des MinMax}
+MinMax, AlphaBeta, AlphaBeta avec profondeur adaptative
+
+\section{Implémentation des fonctions d'évaluation}
+Dans le cadre des fonctions d'évaluation, l'objectif est de déterminer les facteurs déterminants contribuant à la victoire d'un joueur si la profondeur d'un arbre MinMax (ou dérivé) n'est pas suffisante pour connaître l'entièreté du jeu.
+
+À termes, une évaluation entre -1 (avantage \texttt{[J2]}) et 1 (avantage \texttt{[J1]}) est émise pour chaque coup afin d'estimer le mouvement le plus intéressant pour chaque joueur.
+
+\subsection{Une première tentative orienté attaque \textit{raw}}
+Dans cette première tentative, nous avons d'abords essayer d'identifier des caractéristiques "évidentes" pouvant déterminer la victoire d'un joueur :
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item \textbf{Nombre de graine récoltées par joueur :} Plus un joueur a récolté de graine, mieux il est positionné pour la victoire. 
+    Ainsi, l'évaluation doit favoriser les positions maximisant le nombre de graine récolté par un joueur. 
+    Plus précisément, nous nous intéressons aux positions maximisant la différence de graine récoltées par les joueurs. $\left[\texttt{R}_1\right]$
+
+    \item \textbf{Nombre de graine par joueur :} Plus un joueur a de graines dans ces trous, plus il a de marge de man\oe uvre et donc plus élevée est la probabilité d'avoir des coups intéressants plus tard. 
+    Ainsi, nous voulons maximiser le nombre de graine dans les trous d'un joueur. 
+    Par soucis d'uniformisation, nous raisonnons comme précédemment sur la différence graine. $\left[\texttt{R}_2\right]$
+
+    \item \textbf{Nombre de graine transparentes par joueur :} Comme pour le nombre de graine dans les trous d'un joueur, plus un joueur a de graines transparentes, plus élevée est la marge de man\oe uvre en raison de la nature même de ces graines. 
+    Nous voulons donc maximiser cette valeur et raisonnerons sur la différence comme précédemment. $\left[\texttt{R}_3\right]$
+
+    \item \textbf{Potentielles captures :} Sûrement la variable la plus importante, il s'agit ici de savoir combien de graines peuvent êtres capturés pour chaque position évalué. 
+    Bien sûr, nous cherchons à maximiser ce nombre de potentielles captures. $\left[\texttt{R}_4\right]$
+\end{itemize}
+
+Il ne nous reste maintenant qu'à gérer l'agrégation des valeurs ci-dessus mentionnées.
+Pour cela, nous appliquons déjà une étape de normalisation où chaque valeur est transposée entre -1 et 1. 
+Ensuite, nous appliquons une simple somme pondéré afin d'obtenir un résultat entre -1 et 1. 
+
+Les poids de la sommes ont été ajustés à la main et n'ont pas été optimisés parfaitement en raison de contraintes de temps.
+Voici la somme utilisé dans le code :
+\begin{equation}
+    \textit{raw}(\text{pos}) = 0.4\left[\texttt{R}_1\right] + 0.2\left[\texttt{R}_2\right] + 0.1\left[\texttt{R}_3\right] + 0.3\left[\texttt{R}_4\right]
+\end{equation}
+
+En raison d'une mauvaise implémentation de la logique de différence, cette fonction d'évaluation a tendance à faire des erreurs en présentant à \texttt{[J1]} des positions favorables pour \texttt{[J2]} comme étant favorable pour \texttt{[J1]}.
+Grâce aux poids, cet impact néfaste s'est avéré mitigé, mais à aussi rendu la détection du problème beaucoup plus chronophage lors des tests, ce qui a rendu çà correction tardive.
+À date de remise du rapport, une version corrigée existe et est sobrement nommé \textbf{\textit{corrected}}.
+
+\subsection{Deuxième tentative : ALL-IN en défense \textit{defence}}
+Dans une deuxième fonction d'évaluation, nous cherchons à résoudre un point faible de la fonction d'évaluation précédente : l'attaque est trop privilégié par rapport à la défense, ce qui rend certaines positions plus vulnérables à une attaque ennemi.
+
+Pour résoudre ce problème, ou plutôt l'atténuer, nous faisons l'observation simple que moins un joueur possède de trous avec deux ou trois graines, moins il a de chance de se faire capturer ces graines ou de voir naître une chaîne de récolte trop longue profitant à l'adversaire.
+
+Ainsi, nous cherchons à maximiser le nombre de trous ayant une graine ou plus de trois graines. $\left[\texttt{R}_5\right]$
+
+Une fois normalisé entre -1 et 1, nous avons l'agrégation suivante :
+\begin{equation}
+    \textit{defence}(\text{pos}) = 0.25\left[\texttt{R}_1\right] + 0.06\left[\texttt{R}_2\right] + 0.04\left[\texttt{R}_3\right] + 0.3\left[\texttt{R}_4\right] + 0.25\left[\texttt{R}_5\right]
+\end{equation}
+
+Lorem mettre si c'est bien...
+
+% Pk çà tourne en rond...
+
+\section*{Conclusion}
+
+\acknow{Pas de remerciments particulliers}
+\showacknow{} % Display the acknowledgments section
+
+\bibliography{references}
+
+
+\end{document}

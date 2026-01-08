@@ -1,0 +1,29 @@
+cloud: "Cloud" {
+  style.fill: "#EEF2F7"
+  style.stroke: "#1F2937"
+
+  api: "Maze Generator API\n(Flask)" {
+    style.fill: "#DBEAFE"
+    style.stroke: "#2563EB"
+    routes: "Routes" {
+      generate: "/generate\n- Génération de labyrinthes\n- Paramètres dynamiques"
+      get: "/get\n- Recherche de labyrinthes\n- Filtres multi-critères"
+      update: "/updatescore\n- Mise à jour du score"
+    }
+
+    singleton: "MongoDB Singleton\n(Connexion unique)" {
+      style.fill: "#FEF9C3"
+      style.stroke: "#CA8A04"
+    }
+  }
+
+  db: "MongoDB Atlas\n(Base de données)" {
+    style.fill: "#DCFCE7"
+    style.stroke: "#16A34A"
+
+    collection: "Collection: maze\nDocuments JSON"
+  }
+
+  api.routes -> api.singleton
+  api.singleton -> db: "Accès BD"
+}

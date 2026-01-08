@@ -142,14 +142,10 @@ float evaluatePotentialCaptureFixed(struct GameState* game){
         p2Seedtrans += board[i].transSeed;
     }
 
-    int seedsDiff = isP1
-        ? (p1Seedcount - p2Seedcount)
-        : (p2Seedcount - p1Seedcount);
-    int transDiff = isP1
-        ? (p1Seedtrans - p2Seedtrans)
-        : (p2Seedtrans - p1Seedtrans);
+    int seedsDiff = p1Seedcount - p2Seedcount;
+    int transDiff = p1Seedtrans - p2Seedtrans;
 
-    int countDiff = (game->countJ1 - game->countJ2);
+    int countDiff = game->countJ1 - game->countJ2;
     int potential = potentialCaptures(game);
     potential = isP1 ? potential : -potential; // Potential is always positive, so we negate it to avoid problems
 
@@ -214,12 +210,8 @@ float evaluateDefence(struct GameState* game) {
         }
     }
 
-    int seedsDiff = isP1
-        ? (p1Seedcount - p2Seedcount)
-        : (p2Seedcount - p1Seedcount);
-    int transDiff = isP1
-        ? (p1Seedtrans - p2Seedtrans)
-        : (p2Seedtrans - p1Seedtrans);
+    int seedsDiff = p1Seedcount - p2Seedcount;
+    int transDiff = p1Seedtrans - p2Seedtrans;
 
     int countDiff = (game->countJ1 - game->countJ2);
     int potential = potentialCaptures(game);
@@ -228,7 +220,7 @@ float evaluateDefence(struct GameState* game) {
     // NORMALIZATION
     float normDefence = isP1 ? 
         1 - p1OneOrTwoSeed/16.0f : // Proportion of holes that cannot be capture for J1
-        -(1 - p2OneOrTwoSeed/16.0f) ; // Proportion of holes that cannot be captured for J2
+        - (1 - p2OneOrTwoSeed/16.0f) ; // Proportion of holes that cannot be captured for J2
     float normSeedsDiff = seedsDiff / 48.0f; //3c*8h*2p/2 -> 48 seeds
     float normTransDiff = transDiff / 16.0f; //16 possible transmuted seeds in one half of the board (1/hole)
     float normCountDiff = countDiff / 48.0f; //48 seeds maximum at game start (24*2)
@@ -243,9 +235,10 @@ float evaluateDefence(struct GameState* game) {
     // weighted evaluation
     score =
         0.25f * normDefence + 
-        0.35f * normPotential +
-        0.25f * normSeedsDiff +
-        0.15f * normTransDiff;
+        0.3f * normPotential +
+        0.25f * normCountDiff +
+        0.06f * normSeedsDiff +
+        0.04f * normTransDiff;
 
     // clamp -1 ; 1
     if(score > 1.0f) score = 1.0f;
