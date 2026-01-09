@@ -1,4 +1,8 @@
 #include <iostream>
+#include <string>
+#include <thread>
+#include <chrono>
+
 #include "rules/Rules.h"
 #include "players/Player.h"
 #include "players/HumanPlayer.h"
@@ -6,85 +10,65 @@
 #include "players/AlphaBetaPlayer.h"
 
 /* POUR COMPILER */
-//g++ -O2 mainCompet.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awale.exe
+//g++ -O2 mainCompet.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awale_compet.exe
 
 // Maximum number of move (to implement)
 #define MOVELIMIT 400
 
+std::string normalizeMove(const std::string& s) {
+    std::string out;
+    for (char c : s) {
+        if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
+            out += c;
+        }
+    }
+    return out;
+}
+
+
 int main() {
-
-    // Buffer management
-    // https://www.programiz.com/cpp-programming/buffer
-    const int bufferSize = 1024;
-    char *buffer = new char[bufferSize]; 
-
-
 
     GameState game;
     initGameState(&game);
-    bool verbose = true;
-    int moveCount = 0;
 
+    Player* me = nullptr;
+    bool initialized = false;
 
-    // === Création des joueurs ===
-    //Player* player1 = new HumanPlayer(true);   // J1
-    //Player* player2 = new HumanPlayer(false);  // J2
-    //Player* player1 = new MinMaxPlayer(true, 3);
-    //Player* player2 = new MinMaxPlayer(false, 3);
-    Player* player1 = new AlphaBetaPlayer(true, 6);
-    Player* player2 = new AlphaBetaPlayer(false, 6);
+    std::string etat;
 
+    while (std::getline(std::cin, etat)) {
 
-    // === Boucle principale ===
-    while (true) {
-
-        if (verbose) printBoard(&game);
-
-        Player* currentPlayer = game.playJ1 ? player1 : player2;
-        std::string move = currentPlayer->chooseMove(&game);
-
-        // Starvation
-        if (move == "-") {
-            int captured = starvingCapture(&game);
-            std::cout << (game.playJ1 ? "[J1]" : "[J2]")
-                      << " is starving, opponent captures "
-                      << captured << " seeds.\n";
-            game.playJ1 = !game.playJ1;
-            continue;
+        // ===== Initialisation dynamique J1/J2 =====
+        if (!initialized) {
+            bool isJ1 = (etat == "START");
+            me = new AlphaBetaPlayer(isJ1, 2); //6 POUR COMPET
+            initialized = true;
         }
 
-        // Appliquer le coup
-        game = Apply(game, move);
-        moveCount++;
-
-        // === Conditions de fin ===
-        if (game.countJ1 >= 49) {
-            std::cout << "[J1] wins with "
-                      << game.countJ1 << " vs "
-                      << game.countJ2 << "\n";
+        // ===== Réception =====
+        if (etat == "START") {
+            // rien à appliquer
+        }
+        else if (etat == "END" || etat.rfind("RESULT", 0) == 0) {
             break;
         }
-
-        if (game.countJ2 >= 49) {
-            std::cout << "[J2] wins with "
-                      << game.countJ2 << " vs "
-                      << game.countJ1 << "\n";
-            break;
+        else {
+            // Coup adverse
+            game = Apply(game, etat);
         }
 
-        if (game.countSeed < SEED_LIMIT || moveCount >= MOVELIMIT) {
-            if (game.countJ1 > game.countJ2)
-                std::cout << "[J1] wins by seed limit\n";
-            else if (game.countJ2 > game.countJ1)
-                std::cout << "[J2] wins by seed limit\n";
-            else
-                std::cout << "Draw by seed limit\n";
-            break;
-        }
+        // ===== Calcul du coup =====
+        std::string coup = me->chooseMove(&game);
+        coup = normalizeMove(coup);
+
+        // ===== Envoi =====
+        std::cout << coup << std::endl;
+        std::cout.flush();
+
+        // ===== Mise à jour locale =====
+        game = Apply(game, coup);
     }
 
-    delete player1;
-    delete player2;
-    delete[] buffer;
+    delete me;
     return 0;
 }
