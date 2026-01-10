@@ -10,7 +10,7 @@ public class Arbitre {
         // Pour lancer un code java COMPILE : voir https://www.baeldung.com/java-process-api
         // process = Runtime.getRuntime().exec("java -cp src/main/java com.baeldung.java9.process.OutputStreamExample");
         // sinon il faut lancer la compil avant (puis lancer le code compilé):
-//        Process process = Runtime.getRuntime().exec("javac -cp src src\\main\\java\\com\\baeldung\\java9\\process\\OutputStreamExample.java");
+        //Process process = Runtime.getRuntime().exec("javac -cp src src\\main\\java\\com\\baeldung\\java9\\process\\OutputStreamExample.java");
         //Process B = Runtime.getRuntime().exec("java -cp c:\\Users\\Jean-Charles\\Documents\\Work\\Cours\\AIGame\\AIGame\\out\\production\\AIGame\\ JoueurExterne JoueurB");
         //Process B = new ProcessBuilder("./B").start();
 
@@ -35,9 +35,15 @@ public class Arbitre {
                 break;
             }
             nbCoups++;
-            if (nbCoups == 400) {
-                System.out.println("RESULT LIMIT");
+            if (nbCoups >= 400) {
+                String res = "RESULT LIMIT";
+                joueurA.receive(res);
+                joueurB.receive(res);
+                System.out.println(res);
+                break;
             }
+
+
             // Validation du coup
 //            if (!coupValide(reponse)) {
 //                disqualifier(courant, "coup invalide : " + reponse);

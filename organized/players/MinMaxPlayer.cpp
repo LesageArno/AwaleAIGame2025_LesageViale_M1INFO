@@ -30,7 +30,7 @@ std::string MinMaxPlayer::chooseMove(GameState* game) {
     // Appeler ta fonction DecisionMinMax
     std::string move = DecisionMinMax(game, pmax);
 
-    if(verbose) { std::cout << (isJ1 ? "[J1]" : "[J2]") << " MinMax chooses move: " << move << std::endl; }
+    if(verbose) { std::cerr << (isJ1 ? "[J1]" : "[J2]") << " MinMax chooses move: " << move << std::endl; }
 
     return move;
 }

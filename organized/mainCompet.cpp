@@ -59,7 +59,7 @@ int main() {
 
         // ===== Calcul du coup =====
         std::string coup = me->chooseMove(&game);
-        coup = normalizeMove(coup);
+        //coup = normalizeMove(coup);
 
         // ===== Envoi =====
         std::cout << coup << std::endl;

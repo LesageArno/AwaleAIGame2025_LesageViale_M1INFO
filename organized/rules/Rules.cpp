@@ -236,10 +236,20 @@ GameState Apply(GameState game, std::string move) {
         return gameCopy;
     }
 
+
+    
     // === Décodage du coup ===
-    int sep = move.find(' ');
-    int moveFrom = std::stoi(move.substr(0, sep));
-    std::string color = move.substr(sep + 1);
+    int moveFrom;
+    std::string color;
+
+    if (move.find(' ') != std::string::npos) {
+        int sep = move.find(' ');
+        moveFrom = std::stoi(move.substr(0, sep));
+        color = move.substr(sep + 1);
+    } else {
+        moveFrom = std::stoi(move.substr(0, move.size() - 1));
+        color = move.substr(move.size() - 1);
+    }
 
     int lastPos;
 

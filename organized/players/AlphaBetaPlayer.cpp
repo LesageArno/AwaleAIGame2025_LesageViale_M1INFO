@@ -23,9 +23,10 @@ std::string AlphaBetaPlayer::chooseMove(GameState* game) {
 
     std::string move = DecisionAlphaBeta(game, pmax==-1 ? findBestPmax(game) : pmax);
 
-    if (verbose)
-        std::cout << (isJ1 ? "[J1]" : "[J2]") 
-                  << " AlphaBeta chooses move: " << move << std::endl;
+    if (verbose){
+        std::cerr << (isJ1 ? "[J1]" : "[J2]") 
+                        << " AlphaBeta chooses move: " << move << std::endl;
+    }        
 
     return move;
 }
