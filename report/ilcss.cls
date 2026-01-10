@@ -203,7 +203,7 @@
 
 \fancyfoot[LE]{\footerfont\textbf{\thepage}\hspace{7pt}|\hspace{7pt}\@ifundefined{@doi}{}{\@doi}}
 \fancyfoot[RO]{\footerfont Université Côte d'Azur - EUR DS4H\hspace{7pt}|\hspace{7pt}\textbf{18 Décembre 2025}\hspace{7pt}|\hspace{7pt}\textbf{\thepage}}
-\fancyfoot[RE,LO]{\footerfont\@ifundefined{@leadauthor}{}{\@leadauthor}\ifnum \value{authors} > 1\hspace{5pt}\textit{A. Lesage, K. Razafindrabe, J. Viale}\fi}
+\fancyfoot[RE,LO]{\footerfont\@ifundefined{@leadauthor}{}{\@leadauthor}\ifnum \value{authors} > 1\hspace{5pt}\textit{A. Lesage, J. Viale}\fi}
 
 \renewcommand{\headrulewidth}{0pt}% % No header rule
 \renewcommand{\footrulewidth}{0pt}% % No footer rule

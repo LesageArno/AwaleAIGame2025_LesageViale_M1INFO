@@ -12,6 +12,7 @@
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{algorithm}
+\usepackage{graphicx}
 \usepackage[noend]{algpseudocode}
 \usepackage[dvipsnames]{xcolor}
 
@@ -132,7 +133,7 @@ Dans le cadre des fonctions d'évaluation, l'objectif est de déterminer les fac
 
 À termes, une évaluation entre -1 (avantage \texttt{[J2]}) et 1 (avantage \texttt{[J1]}) est émise pour chaque coup afin d'estimer le mouvement le plus intéressant pour chaque joueur.
 
-\subsection{Une première tentative orienté attaque \textit{raw}}
+\subsection{Une première tentative orienté attaque \textit{raw}}\label{eval:raw}
 Dans cette première tentative, nous avons d'abords essayer d'identifier des caractéristiques "évidentes" pouvant déterminer la victoire d'un joueur :
 \begin{itemize}[noitemsep,topsep=0pt]
     \item \textbf{Nombre de graine récoltées par joueur :} Plus un joueur a récolté de graine, mieux il est positionné pour la victoire. 
@@ -176,9 +177,129 @@ Une fois normalisé entre -1 et 1, nous avons l'agrégation suivante :
     \textit{defence}(\text{pos}) = 0.25\left[\texttt{R}_1\right] + 0.06\left[\texttt{R}_2\right] + 0.04\left[\texttt{R}_3\right] + 0.3\left[\texttt{R}_4\right] + 0.25\left[\texttt{R}_5\right]
 \end{equation}
 
-Lorem mettre si c'est bien...
+Maintenant que nous avons nos trois fonctions d'évaluation, il nous faut les comparer pour extraire la fonction la plus adaptée dans le cadre d'une compétition.
 
-% Pk çà tourne en rond...
+\subsection{Méthodologie et Résultats}
+Pour évaluer nos fonctions d'évaluation, nous nous reposerons sur le fait que notre système est complètement déterministe, c'est à dire qu'il n'existe pas dans notre système une séquence d'actions aléatoire rendant notre évaluation stochastique.
+Cela veut dire que l'évaluation des modèles peut se faire en un unique match singulier pour chaque pairs de fonction d'évaluation.
+Pour déterminer la meilleur fonction d'évaluation, il nous suffire in-fine de compter le nombre de victoire et de prendre celle maximisant le nombre de victoire.
+
+Concernant les arbres que nous allons utiliser pour ces tests, nous testerons d'abord avec un Alpha-Beta de profondeur fixé à 6, car cette profondeur est déjà bonne et qu'elle dispose d'une stabilité dans les temps de calculs, ensuite nous utiliserons un Alpha-Beta à profondeur variable, cela nous permettant également de vérifier la plus-value d'un tel système.
+
+Sans plus tarder, voici les résultats obtenus avec un Alpha-Beta de profondeur fixé à 6 :
+
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{%
+        \begin{tabular}{|r|ccc|c|}
+            \hline
+            \multicolumn{1}{|c|}{\textbf{$\texttt{[J1]}$ VS $\texttt{[J2]}$}} &
+            \textbf{$\textit{raw}$} &
+            \textbf{$\textit{defence}$} &
+            \textbf{$\textit{corrected}$} &
+            \textbf{Victoire $\texttt{[J1]}$/$\texttt{[J2]}$} \\ \hline
+            \textbf{$\textit{raw}$}                           & \textbf{51}/14 & \textbf{50}/7  & \textbf{42}/32 & \textbf{3}/0 \\
+            \textbf{$\textit{defence}$}                       & \textbf{50}/8  & 31/\textbf{50} & 18/\textbf{50} & 1/\textbf{2} \\
+            \textbf{$\textit{corrected}$}                     & \textbf{51}/14 & \textbf{50}/7  & \textbf{42}/32 & \textbf{3}/0 \\ \hline
+            \textbf{Victoire $\texttt{[J1]}$/$\texttt{[J2]}$} & \textbf{3}/0   & \textbf{2}/1   & \textbf{2}/1   & \textbf{7}/2 \\ \hline
+        \end{tabular}%
+    }
+    \caption{Score des matchs entre $\texttt{[J1]}$ et $\texttt{[J2]}$ sous Alpha-Beta fixe et par fonction d'évaluation.}
+    \label{tab:AB6}
+\end{table}
+
+Sur la table \ref{tab:AB6}, nous observons plusieurs choses intéressantes.
+Premièrement, au delà des résultats qui nous intéressait initialement, nous observons un potentiel biais en faveur de \texttt{[J1]} dans cette version du jeu de l'Awalé. 
+Nous emmétrons donc l'hypothèse suivante, à confirmer dans la suite :
+\begin{hypothesis}[Biais favorable à \texttt{[J1]}]
+    Il existe un biais dans la version modifiée de l'Awalé rendant la victoire de \texttt{[J1]} plus simple comparé à celle de \texttt{[J2]}.
+\end{hypothesis}
+
+En faisant abstraction de ce biais, nous observons tout de même deux phénomènes importants :
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item La fonction d'évaluation \textbf{\textit{raw}} et \textbf{\textit{corrected}} sont équivalentes du point de vue de \texttt{[J1]} en termes de résultat, mais cette dernière se révèle bien plus efficace au mains de \texttt{[J2]} en réduisant le nombre de capture de \texttt{[J1]} de 33.1\% en moyenne et en augmentant les captures de \texttt{[J2]} de 260\% en moyenne par rapport à \textbf{\textit{raw}}.
+    \item De même, la fonction d'évaluation \textbf{\textit{defence}} ne semble pas convenir à \texttt{[J1]} étant donné que celle-ci se retrouve affaiblis face à une stratégie défensive ou très offensive de l'adversaire. Néanmoins, celle-ci semble bien fonctionner dans les mains de \texttt{[J2]} à condition que \texttt{[J1]} suive aussi une stratégie défensive.
+\end{itemize} 
+
+Au final, en cas d'Alpha-Beta à profondeur fixe, il semble préférable pour les deux joueurs d'exprimer une stratégie purement offensive, car celle-ci se retrouve être la plus versatile face à des stratégies inconnues.
+
+Maintenant, voyons ce que cela donne pour un Alpha-Beta à profondeur évolutive :
+
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{%
+        \begin{tabular}{|r|ccc|c|}
+            \hline
+            \multicolumn{1}{|c|}{\textbf{$\texttt{[J1]}$ VS $\texttt{[J2]}$}} &
+            \textbf{$\textit{raw}$} &
+            \textbf{$\textit{defence}$} &
+            \textbf{$\textit{corrected}$} &
+            \textbf{Victoire $\texttt{[J1]}$/$\texttt{[J2]}$} \\ \hline
+            \textbf{$\textit{raw}$}                           & \textbf{54}/26 & \textbf{30}/27 & \textbf{50}/32 & \textbf{3}/0 \\
+            \textbf{$\textit{defence}$}                       & \textbf{51}/6  & \textbf{27}/22 & \textbf{48}/38 & \textbf{3}/0 \\
+            \textbf{$\textit{corrected}$}                     & \textbf{54}/26 & \textbf{30}/27 & \textbf{50}/32 & \textbf{3}/0 \\ \hline
+            \textbf{Victoire $\texttt{[J1]}$/$\texttt{[J2]}$} & \textbf{3}/0   & \textbf{3}/0   & \textbf{3}/0   & \textbf{9}/0 \\ \hline
+        \end{tabular}%
+    }
+    \caption{Score des matchs entre $\texttt{[J1]}$ et $\texttt{[J2]}$ sous Alpha-Beta adaptatif et par fonction d'évaluation.}
+    \label{tab:ABE}
+\end{table}
+
+Ici, nous observons bien le biais mentionnée précédemment d'une manière d'autant plus amplifié par la profondeur.
+Après en avoir parlé avec d'autres groupes, il s'avère que cette observation est étendue, ce qui nous pousse à confirmer cette hypothèse.
+
+Concernant les résultats en eux même la fonction d'évaluation \textit{\textbf{corrected}} reste équivalente à \textbf{\textit{raw}} du point de vue de \texttt{[J1]}, mais se détache d'autant plus du point de vue de \texttt{[J2]} en maximisant ces captures par rapport à toutes les autres fonctions d'évaluations.
+Cela confirme son rôle de fonction d'évaluation maîtresse pour maximiser les résultats offensifs.
+
+D'un autre côté, la fonction d'évaluation défensive voit ses capacités augmenter en assurant au global une meilleur minimisation du score adverse contre des stratégies offensives légère ou défensive, mais reste vulnérable contre des fonctions très offensive comme \textit{\textbf{corrected}} d'un point de vue de \texttt{[J1]}.
+Néanmoins, du point de vue de \texttt{[J2]}, tout change dans la mesure où l'ensemble des matchs où la stratégie défensive a été utilisé, le score de \texttt{[J1]} a été grandement minimisé par rapport aux autres fonctions d'évaluation, cela avançant ces capacités défensives dans le cas de \texttt{[J2]} uniquement.
+
+Au-delà des résultats présentés, d'autres observations lors des tests restent néanmoins importante à mentionner :
+\begin{itemize}[noitemsep,topsep=0pt]
+    \item Le temps de calcul pour atteindre une profondeur élevé est en moyenne stable en dessous de deux secondes, mais dans certaines situations, non-élucidés à date d'écriture, nous observons des pics en temps de calculs pouvant atteindre 5 secondes voir 15 secondes dans le pire des cas observé et ce sans raisons apparentes. 
+    Plus généralement, nous observons que plus la profondeur augmente, plus des instabilités dans les temps de calculs apparaissent malgré une moyenne stable.
+    Cela est particulièrement vrai dès que la fonction d'évaluation \textbf{\textit{raw}} est impliqué. Cela laisse penser que les erreurs d'implémentations cités dans la sous-section~\ref{eval:raw} interagissent mal avec l'Alpha-Beta rendant les coupes moins probables.
+    \item Nous observons également l'apparition de boucles dès que la victoire est détecté par une fonction d'évaluation. Cela est dû au fait que l'on cherche à trouver la victoire sans se soucier du chemin le plus cours pour l'atteindre. 
+    En d'autres mots, nous détectons la victoire, mais n'y allons pas. Afin d'y remédier, nous avons essayer plusieurs approches, notamment un compteur vérifiant que la longueur du chemin vers la victoire doit diminuer à chaque itération ou en ajoutant un bonus au chemin les plus cours menant à la victoire dans la fonction d'évaluation ; malheureusement, ces méthodes se sont révélés inefficaces.
+    Néanmoins, cela ne se révèle pas être un gros problème en considérant la limite de coup qui avantage celui qui détecte la victoire le plus tôt, même sans l'atteindre à la fin en cas de boucle.
+\end{itemize}
+
+\begin{remark}
+    L'évolution de la profondeur utilisé par les tests est la suivante : Moins de 15\% de graines récupéré au total implique une profondeur de 6, moins de 30\% une profondeur de 7, moins de 70\% une profondeur de 8, moins de 80\% une profondeur de 9, au-delà une profondeur de 10.
+    Ces valeurs pourront évoluer lors de la compétition afin de limiter les instabilités dans le temps de calcul. 
+\end{remark}
+
+Maintenant que ces comparaisons ont été faites, il ne nous reste qu'une seule question relative à la valeur ajouté de la profondeur dynamique. 
+Pour savoir si celle-ci est efficace, nous allons profiter du biais envers \texttt{[J1]} et émettre la réflexion suivante : si \texttt{[J2]} en utilisant une profondeur dynamique fait mieux qu'en utilisant une profondeur fixe face à \texttt{[J1]} utilisant une profondeur fixe, alors c'est que le biais a été mitigé et que la profondeur dynamique a une réelle plus-value.
+
+Voici donc les résultats que nous avons eu avec \texttt{[J1]} en Alpha-Beta de profondeur 6 et \texttt{[J2]} en Alpha-Beta à profondeur adaptative :
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{%
+        \begin{tabular}{|r|ccc|c|}
+            \hline
+            \multicolumn{1}{|c|}{\textbf{$\texttt{[J1]}$ VS $\texttt{[J2]}$}} &
+            \textbf{$\textit{raw}$} &
+            \textbf{$\textit{defence}$} &
+            \textbf{$\textit{corrected}$} &
+            \textbf{Victoire $\texttt{[J1]}$/$\texttt{[J2]}$} \\ \hline
+            \textbf{$\textit{raw}$}                           & \textbf{54}/17 & 42/\textbf{44} & \textbf{48}/15 & \textbf{2}/1 \\
+            \textbf{$\textit{defence}$}                       & \textbf{51}/12 & 25/\textbf{42} & 30/\textbf{49} & 1/\textbf{2} \\
+            \textbf{$\textit{corrected}$}                     & \textbf{54}/17 & 42/\textbf{44} & \textbf{52}/15 & \textbf{2}/1 \\ \hline
+            \textbf{Victoire $\texttt{[J1]}$/$\texttt{[J2]}$} & \textbf{3}/0   & 0/\textbf{3}   & \textbf{2}/1   & \textbf{5}/4 \\ \hline
+        \end{tabular}%
+    }
+    \caption{Score des matchs entre $\texttt{[J1]}$ sous Alpha-Beta fixe et $\texttt{[J2]}$ sous Alpha-Beta adaptatif et par fonction d'évaluation.}
+    \label{tab:ABEVS6}
+\end{table}
+
+Ici, nous observons bien que le biais est mitigé et même presque renversé en faveur de $\texttt{[J2]}$, la profondeur adaptative a donc réellement une plus-value. 
+Cela se confirme également en observant que l'ensemble des victoires de \texttt{[J2]} est un sur-ensemble des victoires obtenues dans la table \ref{tab:AB6}.
+
+Aussi, nous confirmons notre observations précédente que la fonction d'évaluation défensive du point de vue de \texttt{[J2]} se révèle être la plus efficace et celle qui profite le plus lorsqu'une différence de profondeur est observé entre les deux agents.
+Cela revient à dire pour caricaturer qu'une bonne défense doit être préparé, tandis qu'une bonne attaque joue sur la vitesse en début de partie, qui semble au fur et à mesure des tests être le moment le plus important pour une stratégie offensive (la stratégie défensive a l'air moins dépendante de l'avancement de la partie).
+
+Dans cette section, nous avons finalement démontré expérimentalement qu'une approche se basant sur une profondeur adaptative possède une réelle valeur ajoutée. De plus, une stratégie très offensive comme \textit{\textbf{corrected}} se révèle être le plus versatile et offre de meilleurs résultats dans un environment où l'adversaire possède une profondeur et une stratégie inconnue ce qui justifiera son utilisation pour \texttt{[J1]} et \texttt{[J2]}, même si la meilleur fonction d'évaluation pour \texttt{[J2]} semble être la stratégie défensive à grande différence de profondeur. 
 
 \section*{Conclusion}
 
