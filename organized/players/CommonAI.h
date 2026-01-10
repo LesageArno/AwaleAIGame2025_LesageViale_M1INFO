@@ -5,8 +5,8 @@
 #include <vector>
 #include "../rules/GameState.h"
 
-#define J1_EVALUATION_FUNC "corrected" // "raw", "corrected", "defence"
-#define J2_EVALUATION_FUNC "corrected" // "raw", "corrected", "defence"
+#define J1_EVALUATION_FUNC "corrected" // "raw", "corrected", "defence", best is corrected
+#define J2_EVALUATION_FUNC "corrected" // "raw", "corrected", "defence", best is corrected
 
 // Variable to keep track of the shortest path to capture
 extern int winJ1in;
