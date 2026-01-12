@@ -2,9 +2,10 @@ import java.io.*;
 import java.util.concurrent.*;
 
 public class Arbitre {
-    private static final int TIMEOUT_SECONDS = 10; //3 POUR LA COMPET
+    private static final int TIMEOUT_SECONDS = 3; //3 POUR LA COMPET
 
     public static void main(String[] args) throws Exception {
+        
         //Process A = Runtime.getRuntime().exec("java -cp c:\\Users\\Jean-Charles\\Documents\\Work\\Cours\\AIGame\\AIGame\\out\\production\\AIGame\\ JoueurExterne JoueurA");
         //        Process A = new ProcessBuilder("./A").start();
         // Pour lancer un code java COMPILE : voir https://www.baeldung.com/java-process-api
@@ -14,8 +15,19 @@ public class Arbitre {
         //Process B = Runtime.getRuntime().exec("java -cp c:\\Users\\Jean-Charles\\Documents\\Work\\Cours\\AIGame\\AIGame\\out\\production\\AIGame\\ JoueurExterne JoueurB");
         //Process B = new ProcessBuilder("./B").start();
 
-        Process A = Runtime.getRuntime().exec("C:\\Users\\jeanj\\Downloads\\awale_compet.exe");
-        Process B = Runtime.getRuntime().exec("C:\\Users\\jeanj\\Downloads\\awale_compet.exe");
+        //Process A = Runtime.getRuntime().exec("C:\\Users\\jeanj\\Downloads\\awale_compet.exe");
+        //Process B = Runtime.getRuntime().exec("C:\\Users\\jeanj\\Downloads\\awale_compet.exe");
+
+        Process A = new ProcessBuilder("C:\\Users\\jeanj\\Downloads\\awale_compet.exe")
+            .redirectError(ProcessBuilder.Redirect.INHERIT)
+            .start();
+
+        Process B = new ProcessBuilder("C:\\Users\\jeanj\\Downloads\\awale_compet.exe")
+            .redirectError(ProcessBuilder.Redirect.INHERIT)
+            .start();
+
+        // javac Arbitre.java 
+        // java Arbitre.java 2> debug.log
 
         Joueur joueurA = new Joueur("A", A);
         Joueur joueurB = new Joueur("B", B);
