@@ -51,7 +51,11 @@
 %\end{abstract}
 
 \begin{abstract}
-    L'Awalé...
+    L'Awalé est un jeu de stratégie tour-à-tour à deux joueurs, avec pour composante des graines en quantité limitée et des trous attribués aux joueurs de manière uniforme, dans lesquels sont réparties les graines.
+    Le but de chaque joueur est de maximiser le nombre de graines récoltées au cours de la partie, grâce à un ensemble de règles simples.
+    Bien que simples, ces règles, une fois combinées, peuvent engendrer des comportements complexes, éloignant le jeu de l'aléatoire et rendant l'établissement de stratégies importantes pour accomplir l'objectif des joueurs.
+    Ce rapport cherche à implémenter des agents autonomes remplaçant les joueurs humains à des fins compétitives, et à explorer diverses stratégies afin d'évaluer la position de chacun.
+    Celui-ci met également en évidence un biais important favorisant le premier joueur, et les plus-values apportées par les différences de profondeur d'exploration de chaque agent. 
 \end{abstract}
 
 %\begin{abstract}
@@ -69,8 +73,18 @@
 
 
 %\section*{Introduction}
-    \dropcap{L'}Awalé...
-\section{Présentation et règles du jeu}
+    \dropcap{L}'Awalé est un jeu de stratégie tour-à-tour à deux joueurs. 
+    Ce jeu se base sur un système de règles simples, construit autour de deux composants : des graines (en quantité limitée) et des trous assignés à chacun des joueurs.
+    Le but d'un joueur est de maximiser le nombre de graines qu'il a récolté, le joueur en ayant le plus à la fin de la partie étant le gagnant du jeu.
+
+    Dans ce rapport, la partie~\ref{presentation} présente et explicite les règles du jeu. 
+    La partie~\ref{MinMax} s'intéresse à l'automatisation du jeu de l'Awalé, ou en d'autres termes, comment développer une IA rapide et efficace.
+    Enfin, la partie~\ref{Eval} met en évidence les stratégies d'évaluation des positions, ou plutôt, comment dire si une position est avantageuse ou, au contraire, désavantageuse.
+
+
+
+
+\section{Présentation et règles du jeu}\label{presentation}
 
 L'Awalé est un jeu de plateau et de stratégie tour-à-tour à deux joueurs d'origine Africaine datant du VIIIème siècle \cite{Juliette2006}. Le jeu se compose de deux composant : 
 \begin{itemize}[noitemsep,topsep=0pt]
@@ -125,10 +139,10 @@ Enfin, les graines transparentes peuvent êtres jouées soit comme les graines r
     \item \textbf{Égalité :} Dans le cas où la limite de coup ou la limite de graine est dépassée, si aucun joueurs ne domine, alors il y a égalité.
 \end{itemize}
 
-\section{Implémentation des MinMax}
+\section{Implémentation des MinMax}\label{MinMax}
 MinMax, AlphaBeta, AlphaBeta avec profondeur adaptative
 
-\section{Implémentation des fonctions d'évaluation}
+\section{Implémentation des fonctions d'évaluation}\label{Eval}
 Dans le cadre des fonctions d'évaluation, l'objectif est de déterminer les facteurs déterminants contribuant à la victoire d'un joueur si la profondeur d'un arbre MinMax (ou dérivé) n'est pas suffisante pour connaître l'entièreté du jeu.
 
 À termes, une évaluation entre -1 (avantage \texttt{[J2]}) et 1 (avantage \texttt{[J1]}) est émise pour chaque coup afin d'estimer le mouvement le plus intéressant pour chaque joueur.
