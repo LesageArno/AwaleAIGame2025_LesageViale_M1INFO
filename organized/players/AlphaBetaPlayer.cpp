@@ -17,23 +17,26 @@ AlphaBetaPlayer::AlphaBetaPlayer(bool isJ1, int depth, bool verbose)
     : isJ1(isJ1), pmax(depth), verbose(verbose) {}
 
 std::string AlphaBetaPlayer::chooseMove(GameState* game) {
-
+    /*
     std::cerr << "[DEBUG] chooseMove enter "
           << (isJ1 ? "[J1]" : "[J2]")
           << " playJ1=" << game->playJ1
           << " seeds=" << game->countSeed
           << std::endl;
+    */
 
     if (game->playJ1 != isJ1) {
         if (verbose) std::cerr << "Erreur : AlphaBetaPlayer joue hors de son tour !" << std::endl;
         return "-";
     }
     if (isJ1Winning(game) || isJ1Loosing(game) || isDraw(game)) {
+        /*
         std::cerr << "[DEBUG] TERMINAL STATE detected in chooseMove "
                 << "W=" << isJ1Winning(game)
                 << " L=" << isJ1Loosing(game)
                 << " D=" << isDraw(game)
                 << std::endl;
+        */
     }
 
     //std::string move = DecisionAlphaBeta(game, pmax==-1 ? findBestPmax(game) : pmax);
@@ -46,10 +49,12 @@ std::string AlphaBetaPlayer::chooseMove(GameState* game) {
 
     auto t1 = std::chrono::steady_clock::now();
 
+    /*
     std::cerr << "[DEBUG] DecisionAlphaBeta time = "
             << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()
             << " ms"
             << std::endl;
+    */
 
         if (verbose){
             std::cerr << (isJ1 ? "[J1]" : "[J2]") 
@@ -82,10 +87,11 @@ float AlphaBeta(GameState game, float alpha, float beta, int depth) {
     if (!checkAvailableMove(&game)) {
         GameState nextGame = Apply(game, "-");
         // Si le jeu après le "pass" est terminal, renvoyer l'évaluation
+        /*
         if (isJ1Winning(&nextGame)) return 1.0f;
         if (isJ1Loosing(&nextGame)) return -1.0f;
         if (isDraw(&nextGame)) return 0.0f;
-
+        */
         // Sinon, continuer AlphaBeta
         return AlphaBeta(nextGame, alpha, beta, depth - 1);
     }

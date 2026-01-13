@@ -11,7 +11,7 @@ private:
     int pmax;
     bool verbose;
 public:
-    AlphaBetaPlayer(bool isJ1, int depth, bool verbose = true); 
+    AlphaBetaPlayer(bool isJ1, int depth, bool verbose = false); 
     std::string chooseMove(GameState* game) override;
 };
 

@@ -2,6 +2,7 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <algorithm>
 
 #include "rules/Rules.h"
 #include "players/Player.h"
@@ -15,14 +16,10 @@
 // Maximum number of move (to implement)
 #define MOVELIMIT 400
 
-std::string normalizeMove(const std::string& s) {
-    std::string out;
-    for (char c : s) {
-        if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
-            out += c;
-        }
-    }
-    return out;
+std::string normalizeMove(const std::string& coup) {
+    std::string result = coup;
+    result.erase(std::remove(result.begin(), result.end(), ' '), result.end());
+    return result;
 }
 
 
@@ -59,11 +56,11 @@ int main() {
 
         // ===== Calcul du coup =====
         std::string coup = me->chooseMove(&game);
-        //coup = normalizeMove(coup);
+        coup = normalizeMove(coup);
 
         // ===== Envoi =====
-        //std::cout << coup << std::endl;
-        std::cout << coup << " " << game.countJ1 << " " << game.countJ2 << std::endl;
+        std::cerr << "[DEBUT] COUP : "<< coup << " | SCORE J1 : " << game.countJ1 << " | SCORE J2 : " << game.countJ2 << std::endl;
+        std::cout << coup << std::endl;
         std::cout.flush();
 
         // ===== Mise à jour locale =====
