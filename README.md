@@ -5,7 +5,7 @@ Pour des informations sur les choix d'implémentations et la présentation du je
 
 Ce `README` traite des informations pratiques pour l'exécution du code.
 
-**Important :** Le code adaptant notre implémentation de l'Awalé pour la compétition automatique ([Arbitre.java](Arbitre.java), [Arbitre.class](Arbitre.class), [Arbitre$Joueur.class](Arbitre$Joueur.class), [organized/awale_compet.exe](organized/awale_compet.exe) et [organized/mainCompet.cpp](organized/mainCompet.cpp)) est pour le moment bugué rendant la compétition automatique non représentatif de notre travail. La compétition manuelle est néanmoins toujours possible via [organized/awale.exe](organized/awale.exe) et [organized/main.cpp](organized/main.cpp).
+**Important :** Le code adaptant notre implémentation de l'Awalé pour la compétition automatique ([Arbitre.java](Arbitre.java), [Arbitre.class](Arbitre.class), [Arbitre$Joueur.class](Arbitre$Joueur.class), [organized/awale_compet.exe](organized/awale_compet.exe) et [organized/main_competition.cpp](organized/main_competition.cpp)) est pour le moment bugué rendant la compétition automatique non représentatif de notre travail. La compétition manuelle est néanmoins toujours possible via [organized/awale.exe](organized/awale.exe) et [organized/main.cpp](organized/main.cpp).
 
 ### Descriptif de l'architecture
 
@@ -29,5 +29,5 @@ Depuis le répertoire `organized`, exécutez la commande suivante dans le shell 
 g++ -O2 main.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awale.exe
 
 # Pour la compétition automatique
-g++ -O2 mainCompet.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awaleCompet.exe
+g++ -O2 main_competition.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awale_competition_LesageViale.exe
 ```
