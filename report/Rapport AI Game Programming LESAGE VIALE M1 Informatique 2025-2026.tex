@@ -73,70 +73,67 @@
 
 
 %\section*{Introduction}
-    \dropcap{L}'Awalé est un jeu de stratégie tour-à-tour à deux joueurs. 
-    Ce jeu se base sur un système de règles simples, construit autour de deux composants : des graines (en quantité limitée) et des trous assignés à chacun des joueurs.
-    Le but d'un joueur est de maximiser le nombre de graines qu'il a récolté, le joueur en ayant le plus à la fin de la partie étant le gagnant du jeu.
+\dropcap{L'Awalé} est un jeu de stratégie tour-à-tour à deux joueurs. 
+    Ce jeu se base sur un système de règles simples, construit autour de deux composants : des graines (en quantité limitée), et des trous, assignés à chacun des joueurs.
+    Le but d'un joueur est de maximiser le nombre de graines qu'il a récolté ; le joueur en ayant le plus à la fin de la partie l'emporte.
 
     Dans ce rapport, la partie~\ref{presentation} présente et explicite les règles du jeu. 
-    La partie~\ref{MinMax} s'intéresse à l'automatisation du jeu de l'Awalé, ou en d'autres termes, comment développer une IA rapide et efficace.
+    La partie~\ref{MinMax} s'intéresse à l'automatisation du jeu de l'Awalé, ou, en d'autres termes, comment développer une IA rapide et efficace.
     Enfin, la partie~\ref{Eval} met en évidence les stratégies d'évaluation des positions, ou plutôt, comment dire si une position est avantageuse ou, au contraire, désavantageuse.
-
-
-
 
 \section{Présentation et règles du jeu}\label{presentation}
 
-L'Awalé est un jeu de plateau et de stratégie tour-à-tour à deux joueurs d'origine Africaine datant du VIIIème siècle \cite{Juliette2006}. Le jeu se compose de deux composant : 
-\begin{itemize}[noitemsep,topsep=0pt]
+L'Awalé est un jeu de plateau et de stratégie tour-à-tour à deux joueurs, d'origine africaine, datant du VIIIème siècle \cite{Juliette2006}. Le jeu se compose de deux constituants : 
+\begin{itemize}[noitemsep, topsep=0pt]
     \item Un plateau constitué de trous,
     \item Des graines.
 \end{itemize}
 
-Au delà des règles traditionnelles variants de régions en régions, nous détaillerons dans la suite des règles adaptées, ajoutées et/ou simplifiées à des fins d'automatisations.
+Au-delà des règles traditionnelles variant de régions en régions, nous détaillerons dans la suite des règles adaptées, ajoutées et/ou simplifiées à des fins d'automatisation.
 
 \subsubsection*{Plateau et graines} 
-Dans cette version modifiée de l'Awalé, nous utiliserons un plateau composé de 16 trous numérotés de 1 à 16. Les trous impairs appartiennent au premier joueur \texttt{[J1]} et les trous pairs au deuxième joueur \texttt{[J2]}. Les graines, au nombre de 96, sont réparties de manière égale entre trois couleurs : rouge, bleu et transparent.
+Dans cette version modifiée de l'Awalé, nous utiliserons un plateau composé de 16 trous, numérotés de 1 à 16. Les trous impairs appartiennent au premier joueur \texttt{[J1]} et les trous pairs au deuxième joueur \texttt{[J2]}. Les graines, au nombre de 96, sont réparties de manière égale entre trois couleurs : rouge, bleu et transparent.
 
 \subsubsection*{Début de la partie} 
-Au début de la partie, deux graines de chaque couleur sont attribuées dans chaque trous du plateau. \texttt{[J1]} commence.
+Au début de la partie, deux graines de chaque couleur sont attribuées dans chaque trou du plateau. \texttt{[J1]} commence.
 
 \subsubsection*{Déroulé de la partie}
-Au tour de \texttt{[J1]}, \texttt{[J1]} choisi un trou lui appartenant et peut exécuté l'une des actions suivantes (sous réserver que les graines concernées soient dans le trou sélectionné) :
+Au tour de \texttt{[J1]}, [J1] choisit un trou lui appartenant et peut exécuter l'une des actions suivantes (sous réserve que les graines concernées soient dans le trou sélectionné) :
 \begin{itemize}[noitemsep,topsep=0pt]
     \item Jouer les graines rouges \texttt{[r]},
     \item Jouer les graines bleues \texttt{[b]},
     \item Jouer les graines transparentes en tant que graines rouges \texttt{[tr]},
     \item Jouer les graines transparentes en tant que graines bleues \texttt{[tb]}.
 \end{itemize}
-Si \texttt{[J1]} ne peut pas jouer à partir de ces trous à son tour, alors nous sommes dans une situation de famine, le tour de \texttt{[J1]} est passé et \texttt{[J2]} récupère l'ensemble des graines du plateau. 
-Une fois son coup joué, \texttt{[J2]} joue de la même manière et rends la main à \texttt{[J1]}.
+Si \texttt{[J1]} ne peut pas jouer à partir de ces trous à son tour, alors nous sommes dans une situation de famine, le tour de \texttt{[J1]} est passé, et \texttt{[J2]} récupère l'ensemble des graines du plateau. 
+Une fois son coup joué, \texttt{[J2]} joue de la même manière et rend la main à \texttt{[J1]}.
 \begin{remark}
     Un coup est noté \texttt{Nc} où \texttt{N} est le numéro du trou joué et $\texttt{c}\in\{\texttt{r},\texttt{b},\texttt{tr},\texttt{tb}\}$.
 \end{remark}
 
 \subsubsection*{Essaimage}
 L'essaimage correspond au mécanisme à travers lequel les graines sont jouées. 
-Ainsi, une fois jouées, les graines rouges sont supprimés du trou sélectionné et sont réparties une à une dans les trous suivants en ordre croissant.
-Les graines bleues suivent un mécanisme similaire, mais ne répartissent les graines que dans les trous ne lui appartenant pas.
-Enfin, les graines transparentes peuvent êtres jouées soit comme les graines rouges soit comme les graines bleues.   
+Ainsi, une fois jouées, les graines rouges sont supprimées du trou sélectionné et sont réparties une à une dans les trous suivants, en ordre croissant.
+Les graines bleues suivent un mécanisme similaire, mais ne se répartissent que dans les trous du joueur adverse.
+Enfin, les graines transparentes peuvent être jouées soit comme les graines rouges, soit comme les graines bleues.   
 \begin{remark}
     Le trou suivant le trou numéro 16 est le trou numéro 1.
 \end{remark}
 \begin{remark}
-    Si un graine transparente est joué, alors les graines de la couleur sélectionnée sont aussi jouées. Ainsi $\left(\texttt{Play[tr]} \Rightarrow \texttt{Play[r]}\right) \land \left(\texttt{Play[tb]}\Rightarrow\texttt{Play[b]}\right)$. Si les graines de couleur correspondante ne se trouvent pas dans le trou sélectionné, alors les graines transparentes sont jouées sans impacts sur les autres couleurs. 
+    Si une graine transparente est jouée, alors les graines de la couleur sélectionnée sont aussi jouées. Ainsi, $\left(\texttt{Play[tr]} \Rightarrow \texttt{Play[r]}\right) \land \left(\texttt{Play[tb]}\Rightarrow\texttt{Play[b]}\right)$. Si les graines de couleur correspondante ne se trouvent pas dans le trou sélectionné, alors les graines transparentes sont jouées, sans impacts sur les autres couleurs. 
 \end{remark}
 \begin{remark}
-    Si l'essaimage parvient à revenir sur le trou sélectionné, alors celui-ci est sauté et l'essaimage continue sur le trou suivant.
+    Si l'essaimage parvient à revenir sur le trou sélectionné, alors celui-ci est sauté, et l'essaimage continue sur le trou suivant.
 \end{remark}
 
-\subsubsection*{Capture des graines} À la fin de l'essaimage, le trou ayant reçu la dernière graine est vérifié. Si ce trou contient deux ou trois graines, alors la récolte commence et le joueur ayant fait l'essaimage récolte les graines contenu dans le trou et répète l'action pour tous les trous précédents (en ordre décroissant) jusqu'à ce que la condition ne soit plus vérifiée.
+\subsubsection*{Capture des graines} À la fin de l'essaimage, le trou ayant reçu la dernière graine est vérifié. Si ce trou contient deux ou trois graines, alors la récolte commence et le joueur ayant fait l'essaimage récolte les graines contenues dans le trou. L'action est répétée pour tous les trous précédents (en ordre décroissant) jusqu'à ce que la condition ne soit plus vérifiée.
 
 \subsubsection*{Fin de la partie} La fin de la partie peut arriver de plusieurs manières :
 \begin{itemize}[noitemsep,topsep=0pt]
-    \item \textbf{Limite de coup :} Si 400 coups ont été exécutés (200 coups par joueur), alors la partie s'arrête et le joueur ayant le plus de graine remporte la partie.
-    \item \textbf{Limite de graine :} S'il y a moins de dix graines sur le plateau, alors la partie s'arrête et le joueur ayant le plus de graine remporte la partie.
+    \item \textbf{Limite de coup :} Si 400 coups ont été exécutés (200 coups par joueur), alors la partie s'arrête et le joueur ayant le plus de graines remporte la partie.
+    \item \textbf{Limite de graine :} S'il y a moins de dix graines sur le plateau, alors la partie s'arrête et le joueur ayant le plus de graines remporte la partie.
     \item \textbf{Victoire :} Si un joueur a récolté au moins 49 graines, alors le joueur gagne la partie.
-    \item \textbf{Égalité :} Dans le cas où la limite de coup ou la limite de graine est dépassée, si aucun joueurs ne domine, alors il y a égalité.
+    \item \textbf{Égalité :} Dans le cas où la limite de coup ou la limite de graine est dépassée, si aucun joueur ne domine, alors il y a égalité.
 \end{itemize}
 
 \section{Implémentation des MinMax}\label{MinMax}
@@ -201,46 +198,45 @@ Des optimisations supplémentaires ont été appliquées :
 \end{itemize}
 
 \section{Implémentation des fonctions d'évaluation}\label{Eval}
-Dans le cadre des fonctions d'évaluation, l'objectif est de déterminer les facteurs déterminants contribuant à la victoire d'un joueur si la profondeur d'un arbre MinMax (ou dérivé) n'est pas suffisante pour connaître l'entièreté du jeu.
+Dans le cadre des fonctions d'évaluation, l'objectif est de déterminer les facteurs déterminants contribuant à la victoire d'un joueur, si la profondeur d'un arbre MinMax (ou dérivé) n'est pas suffisante pour connaître l'entièreté du jeu.
 
-À termes, une évaluation entre -1 (avantage \texttt{[J2]}) et 1 (avantage \texttt{[J1]}) est émise pour chaque coup afin d'estimer le mouvement le plus intéressant pour chaque joueur.
+À terme, une évaluation entre -1 (avantage \texttt{[J2]}) et 1 (avantage \texttt{[J1]}) est émise pour chaque coup afin d'estimer le mouvement le plus intéressant pour chaque joueur.
 
-\subsection{Une première tentative orienté attaque \textit{raw}}\label{eval:raw}
-Dans cette première tentative, nous avons d'abords essayer d'identifier des caractéristiques "évidentes" pouvant déterminer la victoire d'un joueur :
+\subsection{Une première tentative orientée attaque \textit{raw}}\label{eval:raw}
+Dans cette première tentative, nous avons d'abord essayé d'identifier des caractéristiques "évidentes" pouvant déterminer la victoire d'un joueur :
 \begin{itemize}[noitemsep,topsep=0pt]
-    \item \textbf{Nombre de graine récoltées par joueur :} Plus un joueur a récolté de graine, mieux il est positionné pour la victoire. 
-    Ainsi, l'évaluation doit favoriser les positions maximisant le nombre de graine récolté par un joueur. 
-    Plus précisément, nous nous intéressons aux positions maximisant la différence de graine récoltées par les joueurs. $\left[\texttt{R}_1\right]$
+    \item \textbf{Nombre de graines récoltées par joueur :} Plus un joueur a récolté de graines, mieux celui-ci est positionné pour la victoire. 
+    Ainsi, l'évaluation doit favoriser les positions maximisant le nombre de graines récoltées par un joueur. 
+    Plus précisément, nous nous intéressons aux positions maximisant la différence de graines récoltées par les joueurs. $\left[\texttt{R}_1\right]$
 
-    \item \textbf{Nombre de graine par joueur :} Plus un joueur a de graines dans ces trous, plus il a de marge de man\oe uvre et donc plus élevée est la probabilité d'avoir des coups intéressants plus tard. 
-    Ainsi, nous voulons maximiser le nombre de graine dans les trous d'un joueur. 
-    Par soucis d'uniformisation, nous raisonnons comme précédemment sur la différence graine. $\left[\texttt{R}_2\right]$
+    \item \textbf{Nombre de graines par joueur :} Plus un joueur a de graines dans ses trous, plus il a de marge de manœuvre et donc plus élevée est la probabilité d'avoir des coups intéressants plus tard. 
+    Ainsi, nous voulons maximiser le nombre de graines dans les trous d'un joueur. 
+    Par souci d'uniformisation, nous raisonnons comme précédemment sur la différence de graine. $\left[\texttt{R}_2\right]$
 
-    \item \textbf{Nombre de graine transparentes par joueur :} Comme pour le nombre de graine dans les trous d'un joueur, plus un joueur a de graines transparentes, plus élevée est la marge de man\oe uvre en raison de la nature même de ces graines. 
-    Nous voulons donc maximiser cette valeur et raisonnerons sur la différence comme précédemment. $\left[\texttt{R}_3\right]$
+    \item \textbf{Nombre de graines transparentes par joueur :} Comme pour le nombre de graines dans les trous d'un joueur, plus un joueur a de graines transparentes, plus élevée est la marge de manœuvre en raison de la nature même de ces graines. 
+    Nous voulons donc maximiser cette valeur et raisonnerons sur la différence, comme précédemment. $\left[\texttt{R}_3\right]$
 
-    \item \textbf{Potentielles captures :} Sûrement la variable la plus importante, il s'agit ici de savoir combien de graines peuvent êtres capturés pour chaque position évalué. 
+    \item \textbf{Potentielles captures :} Sûrement la variable la plus importante, il s'agit ici de savoir combien de graines peuvent être capturées pour chaque position évaluée. 
     Bien sûr, nous cherchons à maximiser ce nombre de potentielles captures. $\left[\texttt{R}_4\right]$
 \end{itemize}
 
 Il ne nous reste maintenant qu'à gérer l'agrégation des valeurs ci-dessus mentionnées.
-Pour cela, nous appliquons déjà une étape de normalisation où chaque valeur est transposée entre -1 et 1. 
-Ensuite, nous appliquons une simple somme pondéré afin d'obtenir un résultat entre -1 et 1. 
+Pour cela, nous appliquons déjà une étape de normalisation, où chaque valeur est transposée entre -1 et 1. Ensuite, nous appliquons une simple somme pondérée afin d'obtenir un résultat entre -1 et 1. 
 
-Les poids de la sommes ont été ajustés à la main et n'ont pas été optimisés parfaitement en raison de contraintes de temps.
-Voici la somme utilisé dans le code :
+Les poids de la somme ont été ajustés à la main et n'ont pas été optimisés parfaitement en raison de contraintes de temps.
+Voici la somme utilisée dans le code :
 \begin{equation}
     \textit{raw}(\text{pos}) = 0.4\left[\texttt{R}_1\right] + 0.2\left[\texttt{R}_2\right] + 0.1\left[\texttt{R}_3\right] + 0.3\left[\texttt{R}_4\right]
 \end{equation}
 
 En raison d'une mauvaise implémentation de la logique de différence, cette fonction d'évaluation a tendance à faire des erreurs en présentant à \texttt{[J1]} des positions favorables pour \texttt{[J2]} comme étant favorable pour \texttt{[J1]}.
-Grâce aux poids, cet impact néfaste s'est avéré mitigé, mais à aussi rendu la détection du problème beaucoup plus chronophage lors des tests, ce qui a rendu çà correction tardive.
-À date de remise du rapport, une version corrigée existe et est sobrement nommé \textbf{\textit{corrected}}.
+Grâce aux poids, cet impact néfaste s'est avéré mitigé, mais a aussi rendu la détection du problème beaucoup plus chronophage lors des tests, ce qui a rendu sa correction tardive.
+À la date de remise du rapport, une version corrigée existe et est sobrement nommée \textbf{\textit{corrected}}.
 
 \subsection{Deuxième tentative : ALL-IN en défense \textit{defence}}
-Dans une deuxième fonction d'évaluation, nous cherchons à résoudre un point faible de la fonction d'évaluation précédente : l'attaque est trop privilégié par rapport à la défense, ce qui rend certaines positions plus vulnérables à une attaque ennemi.
+Dans une deuxième fonction d'évaluation, nous cherchons à résoudre un point faible de la fonction d'évaluation précédente : l'attaque est trop privilégiée par rapport à la défense, ce qui rend certaines positions plus vulnérables à une attaque ennemie.
 
-Pour résoudre ce problème, ou plutôt l'atténuer, nous faisons l'observation simple que moins un joueur possède de trous avec deux ou trois graines, moins il a de chance de se faire capturer ces graines ou de voir naître une chaîne de récolte trop longue profitant à l'adversaire.
+Pour résoudre ce problème, ou plutôt l'atténuer, nous faisons l'observation simple que moins un joueur possède de trous avec deux ou trois graines, moins il a de chances de se faire capturer ces graines, ou de voir naître une chaîne de récolte trop longue, profitant à l'adversaire.
 
 Ainsi, nous cherchons à maximiser le nombre de trous ayant une graine ou plus de trois graines. $\left[\texttt{R}_5\right]$
 
@@ -251,14 +247,14 @@ Une fois normalisé entre -1 et 1, nous avons l'agrégation suivante :
 
 Maintenant que nous avons nos trois fonctions d'évaluation, il nous faut les comparer pour extraire la fonction la plus adaptée dans le cadre d'une compétition.
 
-\subsection{Méthodologie et Résultats}
-Pour évaluer nos fonctions d'évaluation, nous nous reposerons sur le fait que notre système est complètement déterministe, c'est à dire qu'il n'existe pas dans notre système une séquence d'actions aléatoire rendant notre évaluation stochastique.
-Cela veut dire que l'évaluation des modèles peut se faire en un unique match singulier pour chaque pairs de fonction d'évaluation.
-Pour déterminer la meilleur fonction d'évaluation, il nous suffire in-fine de compter le nombre de victoire et de prendre celle maximisant le nombre de victoire.
+\subsection{Méthodologie et résultats}
+Pour évaluer nos fonctions d'évaluation, nous nous reposerons sur le fait que notre système est complètement déterministe, c'est-à-dire qu'il n'existe pas, dans notre système, une séquence d'actions aléatoire rendant notre évaluation stochastique.
+Cela veut dire que l'évaluation des modèles peut se faire en un unique match singulier pour chaque paire de fonction d'évaluation.
+Pour déterminer la meilleure fonction d'évaluation, il nous suffira in fine de compter le nombre de victoires et de prendre celle maximisant le nombre de victoires.
 
-Concernant les arbres que nous allons utiliser pour ces tests, nous testerons d'abord avec un Alpha-Beta de profondeur fixé à 6, car cette profondeur est déjà bonne et qu'elle dispose d'une stabilité dans les temps de calculs, ensuite nous utiliserons un Alpha-Beta à profondeur variable, cela nous permettant également de vérifier la plus-value d'un tel système.
+Concernant les arbres que nous allons utiliser pour ces tests, nous testerons d'abord avec un Alpha-Beta de profondeur fixée à 6, car cette profondeur est déjà bonne et qu'elle dispose d'une stabilité dans les temps de calculs, ensuite, nous utiliserons un Alpha-Beta à profondeur variable, cela nous permettant également de vérifier la plus-value d'un tel système.
 
-Sans plus tarder, voici les résultats obtenus avec un Alpha-Beta de profondeur fixé à 6 :
+Sans plus tarder, voici les résultats obtenus avec un Alpha-Beta de profondeur fixée à 6 :
 
 \begin{table}[H]
     \centering
@@ -281,16 +277,16 @@ Sans plus tarder, voici les résultats obtenus avec un Alpha-Beta de profondeur 
 \end{table}
 
 Sur la table \ref{tab:AB6}, nous observons plusieurs choses intéressantes.
-Premièrement, au delà des résultats qui nous intéressait initialement, nous observons un potentiel biais en faveur de \texttt{[J1]} dans cette version du jeu de l'Awalé. 
-Nous emmétrons donc l'hypothèse suivante, à confirmer dans la suite :
+Premièrement, au-delà des résultats qui nous intéressaient initialement, nous observons un potentiel biais en faveur de \texttt{[J1]} dans cette version du jeu de l'Awalé. 
+Nous émettons donc l'hypothèse suivante, à confirmer dans la suite :
 \begin{hypothesis}[Biais favorable à \texttt{[J1]}]
-    Il existe un biais dans la version modifiée de l'Awalé rendant la victoire de \texttt{[J1]} plus simple comparé à celle de \texttt{[J2]}.
+    Il existe un biais dans la version modifiée de l'Awalé rendant la victoire de \texttt{[J1]} plus simple comparée à celle de \texttt{[J2]}.
 \end{hypothesis}
 
 En faisant abstraction de ce biais, nous observons tout de même deux phénomènes importants :
 \begin{itemize}[noitemsep,topsep=0pt]
-    \item La fonction d'évaluation \textbf{\textit{raw}} et \textbf{\textit{corrected}} sont équivalentes du point de vue de \texttt{[J1]} en termes de résultat, mais cette dernière se révèle bien plus efficace au mains de \texttt{[J2]} en réduisant le nombre de capture de \texttt{[J1]} de 33.1\% en moyenne et en augmentant les captures de \texttt{[J2]} de 260\% en moyenne par rapport à \textbf{\textit{raw}}.
-    \item De même, la fonction d'évaluation \textbf{\textit{defence}} ne semble pas convenir à \texttt{[J1]} étant donné que celle-ci se retrouve affaiblis face à une stratégie défensive ou très offensive de l'adversaire. Néanmoins, celle-ci semble bien fonctionner dans les mains de \texttt{[J2]} à condition que \texttt{[J1]} suive aussi une stratégie défensive.
+    \item La fonction d'évaluation \textbf{\textit{raw}} et \textbf{\textit{corrected}} sont équivalentes du point de vue de \texttt{[J1]} en termes de résultat, mais cette dernière se révèle bien plus efficace aux mains de \texttt{[J2]}, en réduisant le nombre de captures de \texttt{[J1]} de 33.1\% en moyenne et en augmentant les captures de \texttt{[J2]} de 260\% en moyenne par rapport à \textbf{\textit{raw}}.
+    \item De même, la fonction d'évaluation \textbf{\textit{defence}} ne semble pas convenir à \texttt{[J1]}, étant donné que celle-ci se retrouve affaiblie face à une stratégie défensive ou très offensive de l'adversaire. Néanmoins, celle-ci semble bien fonctionner dans les mains de \texttt{[J2]}, à condition que \texttt{[J1]} suive aussi une stratégie défensive.
 \end{itemize} 
 
 Au final, en cas d'Alpha-Beta à profondeur fixe, il semble préférable pour les deux joueurs d'exprimer une stratégie purement offensive, car celle-ci se retrouve être la plus versatile face à des stratégies inconnues.
@@ -317,34 +313,34 @@ Maintenant, voyons ce que cela donne pour un Alpha-Beta à profondeur évolutive
     \label{tab:ABE}
 \end{table}
 
-Ici, nous observons bien le biais mentionnée précédemment d'une manière d'autant plus amplifié par la profondeur.
+Ici, nous observons bien le biais mentionné précédemment, d'une manière d'autant plus amplifiée par la profondeur.
 Après en avoir parlé avec d'autres groupes, il s'avère que cette observation est étendue, ce qui nous pousse à confirmer cette hypothèse.
 
-Concernant les résultats en eux même la fonction d'évaluation \textit{\textbf{corrected}} reste équivalente à \textbf{\textit{raw}} du point de vue de \texttt{[J1]}, mais se détache d'autant plus du point de vue de \texttt{[J2]} en maximisant ces captures par rapport à toutes les autres fonctions d'évaluations.
+Concernant les résultats en eux-mêmes, la fonction d'évaluation \textit{\textbf{corrected}} reste équivalente à \textit{\textbf{raw}} du point de vue de \texttt{[J1]}, mais se détache d'autant plus du point de vue de \texttt{[J2]}, en maximisant ces captures par rapport à toutes les autres fonctions d'évaluation.
 Cela confirme son rôle de fonction d'évaluation maîtresse pour maximiser les résultats offensifs.
 
-D'un autre côté, la fonction d'évaluation défensive voit ses capacités augmenter en assurant au global une meilleur minimisation du score adverse contre des stratégies offensives légère ou défensive, mais reste vulnérable contre des fonctions très offensive comme \textit{\textbf{corrected}} d'un point de vue de \texttt{[J1]}.
-Néanmoins, du point de vue de \texttt{[J2]}, tout change dans la mesure où l'ensemble des matchs où la stratégie défensive a été utilisé, le score de \texttt{[J1]} a été grandement minimisé par rapport aux autres fonctions d'évaluation, cela avançant ces capacités défensives dans le cas de \texttt{[J2]} uniquement.
+D'un autre côté, la fonction d'évaluation défensive voit ses capacités augmenter en assurant au global une meilleure minimisation du score adverse contre des stratégies offensives légères ou défensives, mais reste vulnérable contre des fonctions très offensives, comme \textit{\textbf{corrected}} d'un point de vue de \texttt{[J1]}.
+Néanmoins, du point de vue de \texttt{[J2]}, tout change dans la mesure où l'ensemble des matchs où la stratégie défensive a été utilisée, le score de \texttt{[J1]} a été grandement minimisé par rapport aux autres fonctions d'évaluation, avançant ces capacités défensives dans le cas de \texttt{[J2]} uniquement.
 
-Au-delà des résultats présentés, d'autres observations lors des tests restent néanmoins importante à mentionner :
+Au-delà des résultats présentés, d'autres observations lors des tests restent néanmoins importantes à mentionner :
 \begin{itemize}[noitemsep,topsep=0pt]
-    \item Le temps de calcul pour atteindre une profondeur élevé est en moyenne stable en dessous de deux secondes, mais dans certaines situations, non-élucidés à date d'écriture, nous observons des pics en temps de calculs pouvant atteindre 5 secondes voir 15 secondes dans le pire des cas observé et ce sans raisons apparentes. 
-    Plus généralement, nous observons que plus la profondeur augmente, plus des instabilités dans les temps de calculs apparaissent malgré une moyenne stable.
-    Cela est particulièrement vrai dès que la fonction d'évaluation \textbf{\textit{raw}} est impliqué. Cela laisse penser que les erreurs d'implémentations cités dans la sous-section~\ref{eval:raw} interagissent mal avec l'Alpha-Beta rendant les coupes moins probables.
-    \item Nous observons également l'apparition de boucles dès que la victoire est détecté par une fonction d'évaluation. Cela est dû au fait que l'on cherche à trouver la victoire sans se soucier du chemin le plus cours pour l'atteindre. 
-    En d'autres mots, nous détectons la victoire, mais n'y allons pas. Afin d'y remédier, nous avons essayer plusieurs approches, notamment un compteur vérifiant que la longueur du chemin vers la victoire doit diminuer à chaque itération ou en ajoutant un bonus au chemin les plus cours menant à la victoire dans la fonction d'évaluation ; malheureusement, ces méthodes se sont révélés inefficaces.
-    Néanmoins, cela ne se révèle pas être un gros problème en considérant la limite de coup qui avantage celui qui détecte la victoire le plus tôt, même sans l'atteindre à la fin en cas de boucle.
+    \item Le temps de calcul pour atteindre une profondeur élevée est en moyenne stable en dessous de deux secondes, mais dans certaines situations, non élucidées à la date d'écriture, nous observons des pics en temps de calculs pouvant atteindre 5 secondes, voire 15 secondes dans le pire des cas observé, et ce sans raisons apparentes. 
+    Plus généralement, nous observons que plus la profondeur augmente, plus des instabilités dans les temps de calculs apparaissent, malgré une moyenne stable.
+    Cela est particulièrement vrai dès que la fonction d'évaluation \textbf{\textit{raw}} est impliquée. Cela laisse penser que les erreurs d'implémentation citées dans la sous-section~\ref{eval:raw} interagissent mal avec l'Alpha-Beta, rendant les coupes moins probables.
+    \item Nous observons également l'apparition de boucles dès que la victoire est détectée par une fonction d'évaluation. Cela est dû au fait que l'on cherche à trouver la victoire, sans se soucier du chemin le plus court pour l'atteindre. 
+    En d'autres mots, nous détectons la victoire, mais n'y allons pas. Afin d'y remédier, nous avons essayé plusieurs approches, notamment un compteur vérifiant que la longueur du chemin vers la victoire doit diminuer à chaque itération, ou en ajoutant un bonus au chemin le plus court menant à la victoire dans la fonction d'évaluation ; malheureusement, ces méthodes se sont révélées inefficaces.
+    Néanmoins, cela ne se révèle pas être un gros problème, en considérant la limite de coups, qui avantage celui qui détecte la victoire le plus tôt, même sans l'atteindre à la fin, en cas de boucle.
 \end{itemize}
 
 \begin{remark}
-    L'évolution de la profondeur utilisé par les tests est la suivante : Moins de 15\% de graines récupéré au total implique une profondeur de 6, moins de 30\% une profondeur de 7, moins de 70\% une profondeur de 8, moins de 80\% une profondeur de 9, au-delà une profondeur de 10.
-    Ces valeurs pourront évoluer lors de la compétition afin de limiter les instabilités dans le temps de calcul. 
+    L'évolution de la profondeur utilisée par les tests est la suivante : Moins de 15\% de graines récupérées au total implique une profondeur de 6, moins de 30\% une profondeur de 7, moins de 70\% une profondeur de 8, moins de 80\% une profondeur de 9, au-delà une profondeur de 10.
+    Ces valeurs pourront évoluer lors de la compétition, afin de limiter les instabilités dans le temps de calcul. 
 \end{remark}
 
-Maintenant que ces comparaisons ont été faites, il ne nous reste qu'une seule question relative à la valeur ajouté de la profondeur dynamique. 
-Pour savoir si celle-ci est efficace, nous allons profiter du biais envers \texttt{[J1]} et émettre la réflexion suivante : si \texttt{[J2]} en utilisant une profondeur dynamique fait mieux qu'en utilisant une profondeur fixe face à \texttt{[J1]} utilisant une profondeur fixe, alors c'est que le biais a été mitigé et que la profondeur dynamique a une réelle plus-value.
+Maintenant que ces comparaisons ont été faites, il ne nous reste qu'une seule question relative à la valeur ajoutée de la profondeur dynamique. 
+Pour savoir si celle-ci est efficace, nous allons profiter du biais envers \texttt{[J1]} et émettre la réflexion suivante : si \texttt{[J2]}, en utilisant une profondeur dynamique, fait mieux qu'en utilisant une profondeur fixe, face à \texttt{[J1]}, utilisant une profondeur fixe, alors c'est que le biais a été mitigé, et que la profondeur dynamique a une réelle plus-value.
 
-Voici donc les résultats que nous avons eu avec \texttt{[J1]} en Alpha-Beta de profondeur 6 et \texttt{[J2]} en Alpha-Beta à profondeur adaptative :
+Voici donc les résultats que nous avons eus avec \texttt{[J1]} en Alpha-Beta de profondeur 6 et \texttt{[J2]} en Alpha-Beta à profondeur adaptative :
 \begin{table}[H]
     \centering
     \resizebox{\columnwidth}{!}{%
@@ -365,18 +361,27 @@ Voici donc les résultats que nous avons eu avec \texttt{[J1]} en Alpha-Beta de 
     \label{tab:ABEVS6}
 \end{table}
 
-Ici, nous observons bien que le biais est mitigé et même presque renversé en faveur de $\texttt{[J2]}$, la profondeur adaptative a donc réellement une plus-value. 
-Cela se confirme également en observant que l'ensemble des victoires de \texttt{[J2]} est un sur-ensemble des victoires obtenues dans la table \ref{tab:AB6}.
+Ici, nous observons bien que le biais est mitigé, et même presque renversé en faveur de $\texttt{[J2]}$, la profondeur adaptative a donc réellement une plus-value. 
+Cela se confirme également en observant que l'ensemble des victoires de $\texttt{[J2]}$ est un sur-ensemble des victoires obtenues dans la table \ref{tab:AB6}.
 
-Aussi, nous confirmons notre observations précédente que la fonction d'évaluation défensive du point de vue de \texttt{[J2]} se révèle être la plus efficace et celle qui profite le plus lorsqu'une différence de profondeur est observé entre les deux agents.
-Cela revient à dire pour caricaturer qu'une bonne défense doit être préparé, tandis qu'une bonne attaque joue sur la vitesse en début de partie, qui semble au fur et à mesure des tests être le moment le plus important pour une stratégie offensive (la stratégie défensive a l'air moins dépendante de l'avancement de la partie).
+Aussi, nous confirmons notre observation précédente que la fonction d'évaluation défensive du point de vue de \texttt{[J2]} se révèle être la plus efficace et celle qui profite le plus lorsqu'une différence de profondeur est observée entre les deux agents.
+Cela revient à dire, pour caricaturer, qu'une bonne défense doit être préparée, tandis qu'une bonne attaque joue sur la vitesse en début de partie, qui semble, au fur et à mesure des tests, être le moment le plus important pour une stratégie offensive (la stratégie défensive a l'air moins dépendante de l'avancement de la partie).
 
-Dans cette section, nous avons finalement démontré expérimentalement qu'une approche se basant sur une profondeur adaptative possède une réelle valeur ajoutée. De plus, une stratégie très offensive comme \textit{\textbf{corrected}} se révèle être le plus versatile et offre de meilleurs résultats dans un environment où l'adversaire possède une profondeur et une stratégie inconnue ce qui justifiera son utilisation pour \texttt{[J1]} et \texttt{[J2]}, même si la meilleur fonction d'évaluation pour \texttt{[J2]} semble être la stratégie défensive à grande différence de profondeur. 
+Dans cette section, nous avons finalement démontré expérimentalement qu'une approche se basant sur une profondeur adaptative possède une réelle valeur ajoutée. De plus, une stratégie très offensive, comme \textit{\textbf{corrected}}, se révèle être la plus versatile et offre de meilleurs résultats dans un environnement où l'adversaire possède une profondeur et une stratégie inconnues, ce qui justifiera son utilisation pour \texttt{[J1]} et \texttt{[J2]}, même si la meilleure fonction d'évaluation pour \texttt{[J2]} semble être la stratégie défensive à grande différence de profondeur. 
 
 \section*{Conclusion}
 
-\acknow{Pas de remerciments particulliers}
-\showacknow{} % Display the acknowledgments section
+    Dans ce rapport, nous avons présenté une version modifiée de l'Awalé permettant une simplification du développement d'agents autonomes.
+    Après avoir expliqué les règles et les principes clés de la récolte et de l'essaimage, nous avons présenté et expliqué nos choix d'implémentations, tant du point de vue logiciel (pourquoi \textbf{C++}) que du point de vue algorithmique (MinMax, coupe Alpha/Beta, etc.) ou de celui de la représentation du plateau.
+    
+    Ayant expliqué l'intérêt des fonctions d'évaluation dans le cadre d'arbres de jeu non complets, nous avons mis en avant deux stratégies d'évaluation principales, l'une orientée sur l'attaque, l'autre sur la défense. Cela a permis, durant la comparaison de celles-ci, non-seulement de mettre en avant un biais important favorisant le premier joueur, mais aussi de montrer que les stratégies offensives sont meilleures à profondeur de recherche égales, tandis que les stratégies défensives gagnent grandement en performances pour le deuxième joueur, à condition d'avoir une profondeur supérieure à celle de la stratégie du second joueur.
+
+    À des fins compétitives, nous avons donc, à travers ce rapport, expliqué notre choix d'utilisation d'algorithmes offensifs à profondeurs moyennes sous MinMax avec coupes Alpha-Beta.
+    
+    \subsubsection*{Important I} L'approche détaillée dans ce rapport, et notamment le choix des fonctions d'évaluation et/ou des poids pour les profondeurs adaptatives, sont susceptibles de changer d'ici à la compétition.
+    \subsubsection*{Important II} Peu avant la remise de ce rapport, nous nous sommes rendu compte d'un bug dans l'adaptation du code pour la compétition automatisé : \texttt{mainCompet.cpp} et \texttt{Arbitre.java}. 
+    Plus précisément, ce bug, d'origine inconnue, cause l'exécution de coups normalement impossibles par les joueurs et empêche le déroulé d'une partie sans problèmes. Il reste néanmoins possible de faire une compétition manuelle, via le fichier \texttt{main.cpp}, qui fonctionne toujours sans bugs.
+    À la date de finalisation du rapport (le 13 janvier 2026 à 20h20), ce bug est toujours en cours d'investigation.    
 
 \bibliography{references}
 
