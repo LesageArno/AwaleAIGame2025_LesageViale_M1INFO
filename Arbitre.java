@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.concurrent.*;
 
 public class Arbitre {
-    private static final int TIMEOUT_SECONDS = 15; //3 POUR LA COMPET
+    private static final int TIMEOUT_SECONDS = 3; //3 POUR LA COMPET
 
     public static void main(String[] args) throws Exception {
         
@@ -18,12 +18,12 @@ public class Arbitre {
         //Process A = Runtime.getRuntime().exec("C:\\Users\\jeanj\\Downloads\\awale_compet.exe");
         //Process B = Runtime.getRuntime().exec("C:\\Users\\jeanj\\Downloads\\awale_compet.exe");
 
-        Process A = new ProcessBuilder("C:\\Users\\jeanj\\Downloads\\awale_compet.exe")
-            .redirectError(ProcessBuilder.Redirect.INHERIT)
+        Process A = new ProcessBuilder("C:\\Users\\arnol\\Bureau\\Université\\Cours\\Master Informatique - IA - EUR DS4H\\AI Game Programming\\AI_GameProg2025_M1INFO\\organized\\awale_compet.exe")
+            //.redirectError(ProcessBuilder.Redirect.INHERIT)
             .start();
 
-        Process B = new ProcessBuilder("C:\\Users\\jeanj\\Downloads\\awale_compet.exe")
-            .redirectError(ProcessBuilder.Redirect.INHERIT)
+        Process B = new ProcessBuilder("C:\\Users\\arnol\\Bureau\\Université\\Cours\\Master Informatique - IA - EUR DS4H\\AI Game Programming\\AI_GameProg2025_M1INFO\\organized\\awale_compet.exe")
+            //.redirectError(ProcessBuilder.Redirect.INHERIT)
             .start();
 
         // javac Arbitre.java 
