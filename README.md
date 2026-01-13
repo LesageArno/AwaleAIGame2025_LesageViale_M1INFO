@@ -5,7 +5,7 @@ Pour des informations sur les choix d'implémentations et la présentation du je
 
 Ce `README` traite des informations pratiques pour l'exécution du code.
 
-**Important :** Le code adaptant notre implémentation de l'Awalé pour la compétition automatique ([Arbitre.java](Arbitre.java), [Arbitre.class](Arbitre.class), [Arbitre$Joueur.class](Arbitre$Joueur.class), [organized/awale_compet.exe](organized/awale_compet.exe) et [organized/main_competition.cpp](organized/main_competition.cpp)) est pour le moment bugué rendant la compétition automatique non représentatif de notre travail. La compétition manuelle est néanmoins toujours possible via [organized/awale.exe](organized/awale.exe) et [organized/main.cpp](organized/main.cpp).
+**Important :** Le code adaptant notre implémentation de l'Awalé pour la compétition automatique ([Arbitre.java](Arbitre.java), [organized/awale_competition_LesageViale.exe](organized/awale_competition_LesageViale.exe) et [organized/main_competition.cpp](organized/main_competition.cpp)) est pour le moment bugué rendant la compétition automatique non représentatif de notre travail. La compétition manuelle est néanmoins toujours possible via [organized/awale.exe](organized/awale.exe) et [organized/main.cpp](organized/main.cpp).
 
 ### Descriptif de l'architecture
 
