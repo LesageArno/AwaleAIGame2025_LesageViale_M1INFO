@@ -21,3 +21,13 @@ Ensuite, le répertoire `organized/rules` contient un fichier correspondant à l
 
 #### Définir la profondeur utilisé et le type d'agent
 - Enfin, le fichier [organized/main.cpp](organized/main.cpp) est celui mettant en relation les deux joueurs. Celui-ci permet de choisir le type de joueur (premières lignes du main), mais aussi de définir la profondeur à utiliser (-1 pour adaptatif, une valeur positive pour une profondeur fixe).
+
+#### Compilation
+Depuis le répertoire `organized`, exécutez la commande suivante dans le shell :
+```
+# Pour la compétition manuelle
+g++ -O2 main.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awale.exe
+
+# Pour la compétition automatique
+g++ -O2 mainCompet.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awaleCompet.exe
+```
