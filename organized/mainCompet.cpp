@@ -3,12 +3,14 @@
 #include <thread>
 #include <chrono>
 #include <algorithm>
+#include <algorithm>
 
 #include "rules/Rules.h"
 #include "players/Player.h"
 #include "players/HumanPlayer.h"
 #include "players/MinMaxPlayer.h"
 #include "players/AlphaBetaPlayer.h"
+#include "players/CommonAI.h"
 
 /* POUR COMPILER */
 //g++ -O2 mainCompet.cpp rules/GameState.cpp rules/Rules.cpp players/HumanPlayer.cpp players/MinMaxPlayer.cpp players/AlphaBetaPlayer.cpp players\CommonAI.cpp -o awale_compet.exe
@@ -42,11 +44,18 @@ int main() {
             initialized = true;
         }
 
+        if (isJ1Loosing(&game) || isJ1Winning(&game)) {
+            std::cout << "END" << std::endl;
+            std::cout.flush();
+        }
+
         // ===== Réception =====
         if (etat == "START") {
             // rien à appliquer
         }
         else if (etat == "END" || etat.rfind("RESULT", 0) == 0) {
+            std::cout << game.countJ1 << " " << game.countJ2 << std::endl;
+            std::cout.flush();
             break;
         }
         else {
@@ -56,6 +65,7 @@ int main() {
 
         // ===== Calcul du coup =====
         std::string coup = me->chooseMove(&game);
+        coup = normalizeMove(coup);
         coup = normalizeMove(coup);
 
         // ===== Envoi =====
