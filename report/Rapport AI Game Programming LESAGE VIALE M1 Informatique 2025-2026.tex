@@ -140,7 +140,65 @@ Enfin, les graines transparentes peuvent êtres jouées soit comme les graines r
 \end{itemize}
 
 \section{Implémentation des MinMax}\label{MinMax}
-MinMax, AlphaBeta, AlphaBeta avec profondeur adaptative
+
+L'objectif de cette partie est de présenter notre IA pour l'Awalé basée sur l'algorithme MinMax. Cette approche permet à un joueur automatisé d'évaluer les positions possibles jusqu'à une certaine profondeur et de choisir le coup maximisant sa probabilité de victoire.
+
+\subsection{Choix de MinMax et de C++}
+
+Nous avons choisi \textbf{MinMax} pour sa simplicité conceptuelle et sa capacité à explorer exhaustivement l'espace des coups possibles dans un jeu à information parfaite et à deux joueurs. Le \textbf{C++} a été retenu pour sa rapidité et sa gestion fine de la mémoire, essentielle pour les appels récursifs et la manipulation des états de jeu. La compilation avec des flags d'optimisation (\texttt{-O2} ou \texttt{-O3}) améliore encore les performances, notamment pour les fonctions récursives.
+
+\subsection{MinMax}
+
+L'algorithme MinMax explore récursivement toutes les positions possibles jusqu'à une profondeur donnée :
+\begin{itemize}[noitemsep,topsep=0pt]
+\item À chaque niveau, tous les coups possibles du joueur actif sont générés.
+\item Chaque coup est simulé sur un nouvel état de jeu, et MinMax est appelé sur cet état.
+\item Lorsque la profondeur maximale est atteinte ou qu'un état terminal est rencontré (victoire, défaite ou égalité), une fonction d'évaluation estime l'avantage pour le joueur maximisant.
+\item Les valeurs sont propagées vers le haut de l'arbre : le joueur maximisant choisit la valeur la plus élevée, et le joueur minimisant la plus faible.
+\end{itemize}
+
+Bien que MinMax permette de simuler toutes les options, le nombre de positions croît de manière exponentielle avec la profondeur, ce qui peut rendre l'algorithme très lent.
+
+\subsection{Alpha-Beta}
+
+MinMax explore toutes les positions jusqu'à une profondeur donnée, mais le nombre de coups croît exponentiellement, ce qui peut être lent. Pour optimiser, nous utilisons \textbf{Alpha-Beta pruning}, qui permet d'ignorer les branches de l'arbre ne pouvant pas améliorer le résultat pour le joueur courant.
+
+Deux valeurs, \textit{alpha} et \textit{beta}, représentent les bornes des résultats possibles pour le joueur maximisant et le joueur minimisant. Lorsqu'une branche ne peut plus influencer la décision finale, elle est coupée, réduisant fortement le nombre de simulations nécessaires.
+
+Des fonctions d'évaluation spécifiques estiment la qualité des positions intermédiaires selon la stratégie (attaque, défense, capture potentielle). Cette combinaison d'Alpha-Beta et d'évaluations adaptées permet de prendre des décisions rapides tout en maintenant une qualité stratégique élevée.
+
+\subsection{Profondeur adaptative}
+
+La profondeur de recherche n'est pas fixée de manière statique mais adaptée dynamiquement selon l'état du plateau, notamment le nombre de graines restantes. Cette technique, appelée \textbf{profondeur adaptative}, permet de concentrer les ressources de calcul lorsque chaque décision est critique.
+
+Lorsque le plateau est très chargé, la profondeur est réduite pour économiser du temps de calcul. En fin de partie, lorsque chaque coup a un impact majeur, la profondeur est augmentée pour explorer plus finement les options stratégiques. Ainsi, l'algorithme reste rapide tout en garantissant une précision élevée.
+
+\subsection{Structure de données}
+
+Le cœur de l'IA repose sur la structure \texttt{GameState}, qui représente l'état complet du plateau à un instant donné. Elle contient notamment :
+\begin{itemize}[noitemsep,topsep=0pt]
+\item le tableau des trous avec le nombre de graines pour chaque joueur ;
+\item les compteurs de graines récoltées ;
+\item l'indication du joueur dont c'est le tour.
+\end{itemize}
+Cette abstraction permet de passer un état du jeu aux fonctions récursives sans effets de bord et de simuler des coups indépendamment de l'état principal.
+
+\subsection{Implémentation pratique dans le projet}
+
+Dans notre projet, nous avons implémenté MinMax et Alpha-Beta en manipulant la structure \texttt{GameState} de manière centralisée. Chaque appel récursif reçoit une copie de l'état du plateau, ce qui permet de simuler un coup sans modifier l'état réel. Cela évite les effets de bord et rend la fonction récursive plus sûre et modulable.
+
+Pour l'\textbf{Alpha-Beta}, nous avons introduit les bornes \textit{alpha} et \textit{beta} dès le début de la fonction, et nous les mettons à jour à chaque évaluation. Si une branche ne peut plus améliorer le résultat pour le joueur courant, elle est immédiatement ignorée, ce qui réduit fortement le nombre de coups explorés.
+
+La fonction d'évaluation a été conçue pour être flexible : selon la stratégie choisie (attaque, défense, capture potentielle), elle calcule une valeur estimée de la position pour guider MinMax. Cela nous a permis de combiner rapidité et qualité stratégique.
+
+Enfin, la \textbf{profondeur adaptative} a été intégrée en ajustant dynamiquement la profondeur maximale en fonction du nombre de graines restantes sur le plateau. Au début, lorsque les coups possibles sont nombreux, la profondeur est limitée pour gagner du temps. En fin de partie, elle augmente pour permettre une analyse plus précise des positions critiques. Cette approche a été implémentée dans la fonction principale de décision de l'IA, avant chaque appel à Alpha-Beta.
+
+Des optimisations supplémentaires ont été appliquées :
+\begin{itemize}[noitemsep,topsep=0pt]
+\item éviter de recalculer des coups impossibles ou des états déjà évalués ;
+\item ordonner les coups les plus prometteurs en début de liste pour maximiser les coupures Alpha-Beta ;
+\item utiliser des copies locales de \texttt{GameState} pour réduire les coûts mémoire et les effets de bord.
+\end{itemize}
 
 \section{Implémentation des fonctions d'évaluation}\label{Eval}
 Dans le cadre des fonctions d'évaluation, l'objectif est de déterminer les facteurs déterminants contribuant à la victoire d'un joueur si la profondeur d'un arbre MinMax (ou dérivé) n'est pas suffisante pour connaître l'entièreté du jeu.

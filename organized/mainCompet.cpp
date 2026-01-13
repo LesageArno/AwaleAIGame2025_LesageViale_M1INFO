@@ -41,7 +41,7 @@ int main() {
         // ===== Initialisation dynamique J1/J2 =====
         if (!initialized) {
             bool isJ1 = (etat == "START");
-            me = new AlphaBetaPlayer(isJ1, 2); //6 POUR COMPET
+            me = new AlphaBetaPlayer(isJ1, 6); //6 POUR COMPET
             initialized = true;
         }
 
@@ -62,7 +62,8 @@ int main() {
         //coup = normalizeMove(coup);
 
         // ===== Envoi =====
-        std::cout << coup << std::endl;
+        //std::cout << coup << std::endl;
+        std::cout << coup << " " << game.countJ1 << " " << game.countJ2 << std::endl;
         std::cout.flush();
 
         // ===== Mise à jour locale =====

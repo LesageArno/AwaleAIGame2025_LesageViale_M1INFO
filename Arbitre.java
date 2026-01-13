@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.concurrent.*;
 
 public class Arbitre {
-    private static final int TIMEOUT_SECONDS = 3; //3 POUR LA COMPET
+    private static final int TIMEOUT_SECONDS = 15; //3 POUR LA COMPET
 
     public static void main(String[] args) throws Exception {
         
